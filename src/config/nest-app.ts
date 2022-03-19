@@ -4,8 +4,10 @@ import {
   ValidationPipeOptions,
 } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import { AllExceptionsFilter } from '../filters';
-import { exceptionFactoryValidationPipe } from '../pipes';
+import {
+  exceptionFactoryValidationPipe,
+  AllExceptionsFilter,
+} from 'src/common';
 
 const DEFAULT_VALIDATION_PIPE: ValidationPipeOptions = {
   transform: true,

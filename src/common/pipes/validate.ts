@@ -1,5 +1,5 @@
 import { Paramtype, Type, ValidationPipe } from '@nestjs/common';
-import { exceptionFactoryValidationPipe } from '../pipes';
+import { exceptionFactoryValidationPipe } from './exceptions.pipe';
 
 export const transformDtoWithoutGlobalPipe = async (
   value: any,

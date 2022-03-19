@@ -33,6 +33,12 @@ export const ApiCode = {
       code: '001',
       description: 'The something field on headers can not be found',
     },
+
+    // User
+    USER_EXISTED: {
+      code: '1002',
+      description: 'Email has been existed',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {
