@@ -81,6 +81,10 @@ configService.ensureValues([
   'DB_ENTITIES',
   'ACCESS_TOKEN_SECRET',
   'REFRESH_TOKEN_SECRET',
+  'MAIL_ACCOUNT',
+  'MAIL_PASS',
+  'MAIL_TOKEN_SECRET',
+  'CLIENT_DOMAIN',
 ]);
 
 export { configService };

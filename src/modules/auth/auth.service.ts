@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { configService } from 'src/config';
 import { User } from 'src/entities';
+import { MailService } from '../external/mail/mail.service';
 import { UserService } from '../user/user.service';
 import { AccessDeniedException, UnAuthorizedException } from './auth.exception';
 import { JWT_SECRET_KEY } from './common';
@@ -12,13 +14,14 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async login(dto: LoginDto): Promise<TokenDto> {
     const { email, password } = dto;
 
-    const user = await this.userService.findOneByEmail(email);
-    if (!user || !user.isVerified) {
+    const user = await this.userService.findOne({ email, isVerified: true });
+    if (!user) {
       throw new UnAuthorizedException();
     }
 
@@ -35,7 +38,15 @@ export class AuthService {
   }
 
   async signup(dto: SignupDto): Promise<User> {
-    return this.userService.create(dto);
+    const user = await this.userService.create(dto);
+
+    const token = await this.jwtService.signAsync(
+      { email: user.email },
+      { secret: configService.getValue('MAIL_TOKEN_SECRET'), expiresIn: '5m' },
+    );
+    await this.mailService.sendRegisterEmail(user.email, token);
+
+    return user;
   }
 
   async refreshToken(id: number, refreshToken: string): Promise<TokenDto> {
@@ -50,24 +61,54 @@ export class AuthService {
   }
 
   async getTokens(user: User): Promise<TokenDto> {
-    const { id, email, refreshToken } = user;
+    const { id, email, refreshToken: oldRt } = user;
 
-    const tokens = await this.generateTokens(id, email);
+    let accessToken;
+    let refreshToken = oldRt;
 
-    const isRtValidate = refreshToken
-      ? await this.jwtService.verify(refreshToken, {
-          secret: JWT_SECRET_KEY.rt,
-        })
-      : false;
+    try {
+      await this.jwtService.verify(oldRt, {
+        secret: JWT_SECRET_KEY.rt,
+      });
 
-    if (isRtValidate) {
-      return { ...tokens, refreshToken };
+      accessToken = await this.generateAccessToken(id, email);
+    } catch (err) {
+      [accessToken, refreshToken] = await Promise.all([
+        this.generateAccessToken(id, email),
+        this.generateRefreshToken(id, email),
+      ]);
     }
 
-    await this.userService.update(user.id, {
-      refreshToken: tokens.refreshToken,
-    });
-    return tokens;
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async generateAccessToken(id: number, email: string): Promise<string> {
+    return this.jwtService.sign(
+      {
+        sub: id,
+        email,
+      },
+      {
+        expiresIn: '1h',
+        secret: JWT_SECRET_KEY.at,
+      },
+    );
+  }
+
+  async generateRefreshToken(id: number, email: string): Promise<string> {
+    return this.jwtService.sign(
+      {
+        sub: id,
+        email,
+      },
+      {
+        expiresIn: '7d',
+        secret: JWT_SECRET_KEY.rt,
+      },
+    );
   }
 
   async generateTokens(id: number, email: string): Promise<TokenDto> {

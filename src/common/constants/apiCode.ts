@@ -47,6 +47,14 @@ export const ApiCode = {
       code: '1004',
       description: 'Old password is incorrect',
     },
+    TOKEN_INVALID: {
+      code: '1005',
+      description: 'Token is invalid',
+    },
+    EMAIL_VALIDATED: {
+      code: '1006',
+      description: 'Your email had already been validated',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {

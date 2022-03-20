@@ -1,17 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { configService } from 'src/config';
 import { User } from 'src/entities';
 import { FindConditions, Repository } from 'typeorm';
-import { ChangePasswordDto } from './dto';
+import { ChangePasswordDto, ValidateUserQueryDto } from './dto';
 import {
+  EmailValidatedException,
   OldPasswordWrongException,
+  TokenInvalidException,
   UserExistedException,
 } from './user.exception';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async create(data: Partial<User>): Promise<User> {
     const { email, password, username } = data;
@@ -60,12 +71,38 @@ export class UserService {
     });
   }
 
-  async findOneById(id: number): Promise<User> {
-    return this.userRepo.findOne({ id });
+  async validateEmail(query: ValidateUserQueryDto): Promise<void> {
+    const { email, token } = query;
+
+    let payload;
+
+    try {
+      payload = await this.jwtService.verify(token, {
+        secret: configService.getValue('MAIL_TOKEN_SECRET'),
+      });
+    } catch (err) {
+      throw new TokenInvalidException();
+    }
+
+    const { email: encryptedEmail } = payload;
+    if (encryptedEmail !== email) {
+      throw new BadRequestException();
+    }
+
+    const user = await this.userRepo.findOne({ email });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    if (user.isVerified) {
+      throw new EmailValidatedException();
+    }
+
+    this.userRepo.update({ id: user.id }, { isVerified: true });
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    return this.findOne({ email });
+  async findOneById(id: number): Promise<User> {
+    return this.userRepo.findOne({ id });
   }
 
   async findOne(condition: FindConditions<User>): Promise<User> {
