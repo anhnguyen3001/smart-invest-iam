@@ -1,8 +1,8 @@
 import {
   ClassConstructor,
+  classToPlain,
   ClassTransformOptions,
-  instanceToPlain,
-  plainToInstance,
+  plainToClass,
 } from 'class-transformer';
 import { ApiCode } from '../constants';
 import { BaseResponse } from '../dtos';
@@ -23,12 +23,13 @@ export const getBaseResponse = (
   instance.code = response.code || ApiCode[200].DEFAULT.code;
   instance.message = response.message || ApiCode[200].DEFAULT.description;
 
-  if (response.data)
-    instance.data = plainToInstance(
+  if (response.data) {
+    instance.data = plainToClass(
       dataCls,
       Object.assign({}, response.data),
       classTransformOptions,
     );
+  }
 
-  return instanceToPlain(instance);
+  return classToPlain(instance);
 };

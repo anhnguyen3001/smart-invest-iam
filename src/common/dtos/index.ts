@@ -1,5 +1,5 @@
-import { Expose } from 'class-transformer';
-import { IsOptional } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
+import { IsInt, IsOptional } from 'class-validator';
 
 export class BaseResponse<T> {
   @Expose()
@@ -16,6 +16,12 @@ export class BaseResponse<T> {
 }
 
 export class Identity {
+  id: number;
+}
+
+export class RequestParamId {
+  @IsInt()
+  @Type(() => Number)
   id: number;
 }
 

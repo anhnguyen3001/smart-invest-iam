@@ -79,6 +79,8 @@ configService.ensureValues([
   'DB_PASSWORD',
   'DB_DATABASE',
   'DB_ENTITIES',
+  'ACCESS_TOKEN_SECRET',
+  'REFRESH_TOKEN_SECRET',
 ]);
 
 export { configService };

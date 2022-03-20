@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export class BaseEntity {
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamp',
     precision: 6,
@@ -10,6 +12,7 @@ export class BaseEntity {
   @ApiProperty({ type: Date, required: false })
   createdAt: string;
 
+  @Exclude()
   @UpdateDateColumn({
     type: 'timestamp',
     precision: 6,

@@ -39,12 +39,27 @@ export const ApiCode = {
       code: '1002',
       description: 'Email has been existed',
     },
+    PASSWORD_NOT_MATCH: {
+      code: '1003',
+      description: "Password and confirm password don't match",
+    },
+    OLD_PASSWORD_INCORRECT: {
+      code: '1004',
+      description: 'Old password is incorrect',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {
     UNAUTHORIZED: {
       code: '000',
       description: 'Unauthorized',
+    },
+  },
+
+  [HttpStatus.FORBIDDEN]: {
+    ACCESS_DENIED: {
+      code: '000',
+      description: 'Access denied',
     },
   },
 
