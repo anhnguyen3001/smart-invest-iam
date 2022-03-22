@@ -33,36 +33,3 @@ export class OldPasswordWrongException extends APIException {
     );
   }
 }
-
-export class TokenInvalidException extends APIException {
-  constructor(message = ApiCode[400].TOKEN_INVALID.description) {
-    super(
-      ApiCode[400].TOKEN_INVALID.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}
-
-export class ValidateMailException extends APIException {
-  constructor(message = ApiCode[400].TOKEN_INVALID.description) {
-    super(
-      ApiCode[400].TOKEN_INVALID.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}
-
-export class EmailValidatedException extends APIException {
-  constructor(message = ApiCode[400].EMAIL_VALIDATED.description) {
-    super(
-      ApiCode[400].EMAIL_VALIDATED.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}

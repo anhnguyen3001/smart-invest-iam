@@ -1,22 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Patch,
-  Post,
-  Query,
-  Redirect,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { getBaseResponse, GetUserId, IResponse, Public } from 'src/common';
-import { configService } from 'src/config';
-import {
-  ChangePasswordDto,
-  ResultUserDto,
-  UpdateUserDto,
-  ValidateUserQueryDto,
-} from './dto';
+import { getBaseResponse, GetUserId, IResponse } from 'src/common';
+import { ChangePasswordDto, ResultUserDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -60,15 +45,5 @@ export class UserController {
     @Body() dto: ChangePasswordDto,
   ): Promise<void> {
     await this.userService.changePassword(id, dto);
-  }
-
-  @Public()
-  @Get('/validate')
-  @ApiOperation({
-    summary: 'Validate user email',
-  })
-  @Redirect(configService.getValue('CLIENT_DOMAIN'), 301)
-  async validateEmail(@Query() query: ValidateUserQueryDto): Promise<void> {
-    await this.userService.validateEmail(query);
   }
 }

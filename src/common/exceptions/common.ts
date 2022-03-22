@@ -68,3 +68,14 @@ export class MissingFieldHeaderException extends APIException {
     );
   }
 }
+
+export class UserNotFoundException extends APIException {
+  constructor(message = ApiCode[404].USER_NOT_FOUND.description) {
+    super(
+      ApiCode[404].USER_NOT_FOUND.code,
+      HttpStatus.NOT_FOUND,
+      message,
+      undefined,
+    );
+  }
+}

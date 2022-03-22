@@ -37,7 +37,7 @@ export const ApiCode = {
     // User
     USER_EXISTED: {
       code: '1002',
-      description: 'Email has been existed',
+      description: 'User has been existed',
     },
     PASSWORD_NOT_MATCH: {
       code: '1003',
@@ -47,7 +47,7 @@ export const ApiCode = {
       code: '1004',
       description: 'Old password is incorrect',
     },
-    TOKEN_INVALID: {
+    INVALID_TOKEN: {
       code: '1005',
       description: 'Token is invalid',
     },
@@ -71,7 +71,12 @@ export const ApiCode = {
     },
   },
 
-  [HttpStatus.NOT_FOUND]: {},
+  [HttpStatus.NOT_FOUND]: {
+    USER_NOT_FOUND: {
+      code: '000',
+      description: 'Not found user',
+    },
+  },
 
   [HttpStatus.FAILED_DEPENDENCY]: {
     EXTERNAL_API_ERROR: {

@@ -4,21 +4,27 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   getBaseResponse,
   GetUser,
   GetUserId,
-  Identity,
   IResponse,
   Public,
   RtGuard,
 } from 'src/common';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto, TokenDto } from './dtos';
-import { LocalAuthGuard } from './guards';
+import {
+  ForgetPasswordDto,
+  LoginDto,
+  ResetPasswordDto,
+  SignupDto,
+  TokenDto,
+  VerifyUserQueryDto,
+} from './dtos';
 
 @ApiTags('Auth')
 @Controller({
@@ -45,10 +51,29 @@ export class AuthController {
 
   @Public()
   @Post('/signup')
-  async signup(@Body() dto: SignupDto): Promise<IResponse> {
-    const user = await this.authService.signup(dto);
+  async signup(@Body() dto: SignupDto): Promise<void> {
+    await this.authService.signup(dto);
+  }
 
-    return getBaseResponse({ data: { id: user.id } }, Identity);
+  @Public()
+  @Get('verify')
+  @ApiOperation({
+    summary: 'Validate user email',
+  })
+  async verifyUser(@Query() query: VerifyUserQueryDto): Promise<void> {
+    await this.authService.verifyUser(query);
+  }
+
+  @Public()
+  @Post('forget-password')
+  async forgetPassword(@Body() dto: ForgetPasswordDto): Promise<void> {
+    await this.authService.forgetPassword(dto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
+    await this.authService.resetPassword(dto);
   }
 
   @UseGuards(RtGuard)

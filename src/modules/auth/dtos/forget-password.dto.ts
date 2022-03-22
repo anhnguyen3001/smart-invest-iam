@@ -1,11 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common';
 
-export class ValidateUserQueryDto {
-  @IsString()
+export class ForgetPasswordDto {
+  @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.email)
-  email: string;
-
   @IsString()
-  token: string;
+  email: string;
 }
