@@ -4,3 +4,4 @@ export * from './reset-password.dto';
 export * from './signup.dto';
 export * from './tokens.dto';
 export * from './verify-user.dto';
+export * from './resend-mail.dto';

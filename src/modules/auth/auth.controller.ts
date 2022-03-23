@@ -20,6 +20,7 @@ import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
   LoginDto,
+  ResendMailQueryDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
@@ -35,7 +36,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Post('/login')
+  @Post('login')
   @HttpCode(200)
   @ApiOkResponse({ description: 'Login successfully' })
   async login(@Body() loginDto: LoginDto): Promise<IResponse> {
@@ -44,13 +45,13 @@ export class AuthController {
     return getBaseResponse({ data: tokens }, TokenDto);
   }
 
-  @Get('/logout')
+  @Get('logout')
   async logout(@GetUserId() id: number): Promise<void> {
     await this.authService.logout(id);
   }
 
   @Public()
-  @Post('/signup')
+  @Post('signup')
   async signup(@Body() dto: SignupDto): Promise<void> {
     await this.authService.signup(dto);
   }
@@ -76,8 +77,14 @@ export class AuthController {
     await this.authService.resetPassword(dto);
   }
 
+  @Public()
+  @Get('resend-mail')
+  async resendMail(@Query() query: ResendMailQueryDto): Promise<void> {
+    await this.authService.resendMail(query);
+  }
+
   @UseGuards(RtGuard)
-  @Get('/refresh-token')
+  @Get('refresh-token')
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,

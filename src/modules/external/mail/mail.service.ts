@@ -6,7 +6,7 @@ import { configService } from 'src/config';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendRegisterMail(email: string, token: string) {
+  async sendVerifyUserMail(email: string, token: string) {
     const url = `http://${configService.getValue(
       'CLIENT_DOMAIN',
     )}/verify?email=${email}&token=${token}`;

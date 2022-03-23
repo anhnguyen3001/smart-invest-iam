@@ -17,6 +17,8 @@ import { JWT_SECRET_KEY } from './common';
 import {
   ForgetPasswordDto,
   LoginDto,
+  ResendMailQueryDto,
+  MailEnum,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
@@ -56,8 +58,7 @@ export class AuthService {
   async signup(dto: SignupDto): Promise<User> {
     const user = await this.userService.create(dto);
 
-    const token = await this.generateMailToken(user.email);
-    await this.mailService.sendRegisterMail(user.email, token);
+    await this.sendVerifyUserMail(user.email);
 
     return user;
   }
@@ -87,8 +88,7 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    const token = await this.generateMailToken(email);
-    await this.mailService.sendForgetPasswordMail(email, token);
+    await this.sendForgetPasswordMail(email);
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<void> {
@@ -105,6 +105,31 @@ export class AuthService {
 
     const password = await hashData(newPassword);
     await this.userService.update(user.id, { password });
+  }
+
+  async resendMail(data: ResendMailQueryDto): Promise<void> {
+    const { type, email } = data;
+
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    if (type === MailEnum.register) {
+      await this.sendVerifyUserMail(email);
+    } else if (type === MailEnum.resetPassword) {
+      await this.sendForgetPasswordMail(email);
+    }
+  }
+
+  async sendVerifyUserMail(email: string): Promise<void> {
+    const token = await this.generateMailToken(email);
+    await this.mailService.sendVerifyUserMail(email, token);
+  }
+
+  async sendForgetPasswordMail(email: string): Promise<void> {
+    const token = await this.generateMailToken(email);
+    await this.mailService.sendForgetPasswordMail(email, token);
   }
 
   async refreshToken(id: number, refreshToken: string): Promise<TokenDto> {
