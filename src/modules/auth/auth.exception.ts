@@ -34,17 +34,6 @@ export class InvalidTokenException extends APIException {
   }
 }
 
-export class InvalidCredentialException extends APIException {
-  constructor(message = ApiCode[400].INVALID_TOKEN.description) {
-    super(
-      ApiCode[400].INVALID_TOKEN.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}
-
 export class EmailValidatedException extends APIException {
   constructor(message = ApiCode[400].EMAIL_VALIDATED.description) {
     super(

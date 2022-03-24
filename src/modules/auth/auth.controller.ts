@@ -16,6 +16,7 @@ import {
   Public,
   RtGuard,
 } from 'src/common';
+import { User } from 'src/entities';
 import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
@@ -26,6 +27,7 @@ import {
   TokenDto,
   VerifyUserQueryDto,
 } from './dtos';
+import { FBAuthGuard } from './guards';
 
 @ApiTags('Auth')
 @Controller({
@@ -43,6 +45,20 @@ export class AuthController {
     const tokens = await this.authService.login(loginDto);
 
     return getBaseResponse({ data: tokens }, TokenDto);
+  }
+
+  @Public()
+  @UseGuards(FBAuthGuard)
+  @Get('facebook')
+  async loginFB(): Promise<void> {
+    console.log('abc');
+  }
+
+  @Public()
+  @UseGuards(FBAuthGuard)
+  @Get('facebook/redirect')
+  async redirectFB(@GetUser() user: User): Promise<TokenDto> {
+    return this.authService.loginFB(user);
   }
 
   @Get('logout')

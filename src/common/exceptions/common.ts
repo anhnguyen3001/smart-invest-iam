@@ -79,3 +79,25 @@ export class UserNotFoundException extends APIException {
     );
   }
 }
+
+export class InvalidCredentialException extends APIException {
+  constructor(message = ApiCode[400].INVALID_CREDENTIALS.description) {
+    super(
+      ApiCode[400].INVALID_CREDENTIALS.code,
+      HttpStatus.BAD_REQUEST,
+      message,
+      undefined,
+    );
+  }
+}
+
+export class UserExistedException extends APIException {
+  constructor(message = ApiCode[400].USER_EXISTED.description) {
+    super(
+      ApiCode[400].USER_EXISTED.code,
+      HttpStatus.BAD_REQUEST,
+      message,
+      undefined,
+    );
+  }
+}

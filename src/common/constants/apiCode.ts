@@ -55,6 +55,10 @@ export const ApiCode = {
       code: '1006',
       description: 'Your email had already been validated',
     },
+    INVALID_CREDENTIALS: {
+      code: '1005',
+      description: 'Credentials are invalid',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {

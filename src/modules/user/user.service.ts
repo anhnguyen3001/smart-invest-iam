@@ -1,38 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { hashData } from 'src/common';
-import { User } from 'src/entities';
+import {
+  hashData,
+  InvalidCredentialException,
+  UserExistedException,
+} from 'src/common';
+import { MethodEnum, User } from 'src/entities';
 import { FindConditions, Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto';
-import {
-  OldPasswordWrongException,
-  UserExistedException,
-} from './user.exception';
+import { OldPasswordWrongException } from './user.exception';
+import { CreateUser } from './user.type';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private userRepo: Repository<User>,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  async create(data: Partial<User>): Promise<User> {
-    const { email, password, username } = data;
+  async create(data: CreateUser): Promise<User> {
+    const { password, method = MethodEnum.local, ...rest } = data;
 
-    const existedUser = await this.findOneByEmail(email);
+    const existedUser = await this.findOneByEmail(data.email);
     if (existedUser) {
       throw new UserExistedException();
     }
 
-    const hashPassword = await hashData(password);
+    let hashPassword;
+    if (method === MethodEnum.local) {
+      if (!password) throw new InvalidCredentialException();
+
+      hashPassword = await hashData(password);
+    }
 
     return this.userRepo.save(
       this.userRepo.create({
-        email,
-        username,
         password: hashPassword,
+        method,
+        ...rest,
       }),
     );
   }

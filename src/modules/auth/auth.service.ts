@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { hashData, UserNotFoundException } from 'src/common';
+import {
+  hashData,
+  InvalidCredentialException,
+  UserNotFoundException,
+} from 'src/common';
 import { configService } from 'src/config';
 import { User } from 'src/entities';
 import { MailService } from '../external/mail/mail.service';
@@ -9,16 +13,15 @@ import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
   EmailValidatedException,
-  InvalidCredentialException,
   InvalidTokenException,
   UnAuthorizedException,
 } from './auth.exception';
-import { JWT_SECRET_KEY } from './common';
+import { JWT_SECRET_KEY, LoginSocialInfo } from './common';
 import {
   ForgetPasswordDto,
   LoginDto,
-  ResendMailQueryDto,
   MailEnum,
+  ResendMailQueryDto,
   ResetPasswordDto,
   SignupDto,
   TokenDto,
@@ -48,6 +51,10 @@ export class AuthService {
       throw new UnAuthorizedException();
     }
 
+    return this.getTokens(user);
+  }
+
+  async loginFB(user: User): Promise<TokenDto> {
     return this.getTokens(user);
   }
 
@@ -222,5 +229,27 @@ export class AuthService {
 
   async validateUser(id: number, email: string): Promise<User> {
     return this.userService.findOne({ id, email });
+  }
+
+  async validateFBUser(user: LoginSocialInfo): Promise<User> {
+    const { email } = user;
+
+    let currentUser = await this.userService.findOneByEmail(email);
+
+    if (!currentUser) {
+      // User login first time
+      currentUser = await this.userService.create({
+        ...user,
+        isVerified: true,
+      });
+    }
+    // else {
+    //   const { method } = currentUser;
+    //   if (method !== MethodEnum.facebook) {
+    //     throw new UserExistedException();
+    //   }
+    // }
+
+    return currentUser;
   }
 }

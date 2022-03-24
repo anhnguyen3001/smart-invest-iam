@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
-import { PATTERN_VALIDATION } from 'src/common';
-import { InvalidCredentialException } from '../auth.exception';
+import { PATTERN_VALIDATION, InvalidCredentialException } from 'src/common';
 
 export class LoginDto {
   @ApiProperty({ type: 'string' })
