@@ -56,13 +56,17 @@ class ConfigService {
 
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
-      type: this.getValue('DB_CONNECTION') as any,
-      host: this.getValue('DB_HOST'),
-      port: this.toNumber(this.getValue('DB_PORT')),
-      username: this.getValue('DB_USERNAME'),
-      password: this.getValue('DB_PASSWORD'),
-      database: this.getValue('DB_DATABASE'),
-      entities: this.toArray(this.getValue('DB_ENTITIES')),
+      type: this.getValue('TYPEORM_CONNECTION') as any,
+      host: this.getValue('TYPEORM_HOST'),
+      port: this.toNumber(this.getValue('TYPEORM_PORT')),
+      username: this.getValue('TYPEORM_USERNAME'),
+      password: this.getValue('TYPEORM_PASSWORD'),
+      database: this.getValue('TYPEORM_DATABASE'),
+      entities: this.toArray(this.getValue('TYPEORM_ENTITIES')),
+      migrations: this.getValue('TYPEORM_MIGRATIONS') as any,
+      cli: {
+        migrationsDir: this.getValue('TYPEORM_MIGRATIONS_DIR'),
+      },
       charset: 'utf8mb4_unicode_ci',
       namingStrategy: new SnakeNamingStrategy(),
     };
@@ -72,13 +76,15 @@ class ConfigService {
 const configService = new ConfigService(process.env);
 
 configService.ensureValues([
-  'DB_CONNECTION',
-  'DB_HOST',
-  'DB_PORT',
-  'DB_USERNAME',
-  'DB_PASSWORD',
-  'DB_DATABASE',
-  'DB_ENTITIES',
+  'TYPEORM_CONNECTION',
+  'TYPEORM_HOST',
+  'TYPEORM_PORT',
+  'TYPEORM_USERNAME',
+  'TYPEORM_PASSWORD',
+  'TYPEORM_DATABASE',
+  'TYPEORM_ENTITIES',
+  'TYPEORM_MIGRATIONS',
+  'TYPEORM_MIGRATIONS_DIR',
   'ACCESS_TOKEN_SECRET',
   'REFRESH_TOKEN_SECRET',
   'MAIL_ACCOUNT',

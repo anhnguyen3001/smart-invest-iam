@@ -16,7 +16,7 @@ import {
   InvalidTokenException,
   UnAuthorizedException,
 } from './auth.exception';
-import { JWT_SECRET_KEY, LoginSocialInfo } from './common';
+import { JWT_SECRET_KEY, LoginSocialInfo, JWTPayload } from './common';
 import {
   ForgetPasswordDto,
   LoginDto,
@@ -153,7 +153,7 @@ export class AuthService {
   async getTokens(user: User): Promise<TokenDto> {
     const { id, email, refreshToken: oldRt } = user;
 
-    let accessToken;
+    let accessToken: string;
     let refreshToken = oldRt;
 
     try {
@@ -211,7 +211,7 @@ export class AuthService {
   }
 
   async validateTokenMail(email: string, token: string): Promise<void> {
-    let payload;
+    let payload: JWTPayload;
 
     try {
       payload = await this.jwtService.verify(token, {
