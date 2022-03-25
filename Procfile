@@ -1,0 +1,1 @@
+web: yarn migration:up && yarn run start:prod
