@@ -63,7 +63,7 @@ class ConfigService {
       password: this.getValue('TYPEORM_PASSWORD'),
       database: this.getValue('TYPEORM_DATABASE'),
       entities: this.toArray(this.getValue('TYPEORM_ENTITIES')),
-      migrations: this.getValue('TYPEORM_MIGRATIONS') as any,
+      migrations: this.toArray(this.getValue('TYPEORM_MIGRATIONS')),
       cli: {
         migrationsDir: this.getValue('TYPEORM_MIGRATIONS_DIR'),
       },
