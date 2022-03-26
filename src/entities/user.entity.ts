@@ -1,6 +1,7 @@
 import { BaseEntity } from './base.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum MethodEnum {
   local = 'local',
@@ -15,9 +16,11 @@ export class User extends BaseEntity {
   id: number;
 
   @Column({ length: 255 })
+  @ApiProperty({ type: 'string' })
   email: string;
 
   @Column({ length: 255 })
+  @ApiProperty({ type: 'string' })
   username: string;
 
   @Exclude()
@@ -29,6 +32,7 @@ export class User extends BaseEntity {
   isVerified?: boolean = false;
 
   @Column({ length: 255, nullable: true })
+  @ApiProperty({ type: 'string' })
   avatar?: string;
 
   @Exclude()

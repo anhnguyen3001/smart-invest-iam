@@ -7,15 +7,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  getBaseResponse,
-  GetUser,
-  GetUserId,
-  IResponse,
-  Public,
-  RtGuard,
-} from 'src/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GetUser, GetUserId, Public, RtGuard } from 'src/common';
 import { User } from 'src/entities';
 import { AuthService } from './auth.service';
 import {
@@ -40,11 +33,13 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(200)
-  @ApiOkResponse({ description: 'Login successfully' })
-  async login(@Body() loginDto: LoginDto): Promise<IResponse> {
-    const tokens = await this.authService.login(loginDto);
-
-    return getBaseResponse({ data: tokens }, TokenDto);
+  @ApiOkResponse({
+    status: 200,
+    type: TokenDto,
+    description: 'Login successfully',
+  })
+  async login(@Body() loginDto: LoginDto): Promise<TokenDto> {
+    return this.authService.login(loginDto);
   }
 
   @Public()
@@ -68,27 +63,27 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @ApiOkResponse({ description: 'Sign up successfully' })
   async signup(@Body() dto: SignupDto): Promise<void> {
     await this.authService.signup(dto);
   }
 
   @Public()
   @Get('verify')
-  @ApiOperation({
-    summary: 'Validate user email',
-  })
   async verifyUser(@Query() query: VerifyUserQueryDto): Promise<void> {
     await this.authService.verifyUser(query);
   }
 
   @Public()
   @Post('forget-password')
+  @ApiOkResponse({ description: 'Forget password successfully' })
   async forgetPassword(@Body() dto: ForgetPasswordDto): Promise<void> {
     await this.authService.forgetPassword(dto);
   }
 
   @Public()
   @Post('reset-password')
+  @ApiOkResponse({ description: 'Reset password successfully' })
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
     await this.authService.resetPassword(dto);
   }
@@ -104,9 +99,7 @@ export class AuthController {
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<IResponse> {
-    const tokens = await this.authService.refreshToken(id, refreshToken);
-
-    return getBaseResponse({ data: tokens }, TokenDto);
+  ): Promise<TokenDto> {
+    return this.authService.refreshToken(id, refreshToken);
   }
 }
