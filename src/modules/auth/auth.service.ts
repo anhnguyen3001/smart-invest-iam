@@ -61,7 +61,8 @@ export class AuthService {
   }
 
   async signup(dto: SignupDto): Promise<User> {
-    const user = await this.userService.create(dto);
+    const { confirmPassword, ...restDto } = dto;
+    const user = await this.userService.create(restDto);
 
     await this.sendVerifyUserMail(user.email);
 
