@@ -68,36 +68,3 @@ export class MissingFieldHeaderException extends APIException {
     );
   }
 }
-
-export class UserNotFoundException extends APIException {
-  constructor(message = ApiCode[404].USER_NOT_FOUND.description) {
-    super(
-      ApiCode[404].USER_NOT_FOUND.code,
-      HttpStatus.NOT_FOUND,
-      message,
-      undefined,
-    );
-  }
-}
-
-export class InvalidCredentialException extends APIException {
-  constructor(message = ApiCode[400].INVALID_CREDENTIALS.description) {
-    super(
-      ApiCode[400].INVALID_CREDENTIALS.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}
-
-export class UserExistedException extends APIException {
-  constructor(message = ApiCode[400].USER_EXISTED.description) {
-    super(
-      ApiCode[400].USER_EXISTED.code,
-      HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}

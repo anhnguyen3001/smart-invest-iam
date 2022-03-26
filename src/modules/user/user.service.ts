@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import {
-  hashData,
-  InvalidCredentialException,
-  UserExistedException,
-} from 'src/common';
+import { hashData } from 'src/common';
 import { MethodEnum, User } from 'src/entities';
 import { FindConditions, Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto';
-import { OldPasswordWrongException } from './user.exception';
+import {
+  OldPasswordWrongException,
+  UserExistedException,
+  LackPasswordException,
+} from './user.exception';
 import { CreateUser } from './user.type';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class UserService {
 
     let hashPassword;
     if (method === MethodEnum.local) {
-      if (!password) throw new InvalidCredentialException();
+      if (!password) throw new LackPasswordException();
 
       hashPassword = await hashData(password);
     }

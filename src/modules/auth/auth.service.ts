@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import {
-  hashData,
-  InvalidCredentialException,
-  UserNotFoundException,
-} from 'src/common';
+import { hashData } from 'src/common';
 import { configService } from 'src/config';
 import { User } from 'src/entities';
 import { MailService } from '../external/mail/mail.service';
@@ -15,6 +11,8 @@ import {
   EmailValidatedException,
   InvalidTokenException,
   UnAuthorizedException,
+  InvalidCredentialException,
+  UserNotFoundException,
 } from './auth.exception';
 import { JWT_SECRET_KEY, LoginSocialInfo, JWTPayload } from './common';
 import {

@@ -49,7 +49,7 @@ export const ApiCode = {
     },
     INVALID_TOKEN: {
       code: '1005',
-      description: 'Token is invalid',
+      description: 'Invalid token',
     },
     EMAIL_VALIDATED: {
       code: '1006',
@@ -57,7 +57,11 @@ export const ApiCode = {
     },
     INVALID_CREDENTIALS: {
       code: '1005',
-      description: 'Credentials are invalid',
+      description: 'Invalid credentials',
+    },
+    LACK_PASSWORD: {
+      code: '1006',
+      description: 'Lack of password to create account',
     },
   },
 

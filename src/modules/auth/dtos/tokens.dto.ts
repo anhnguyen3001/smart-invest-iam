@@ -7,7 +7,3 @@ export class Tokens {
   @ApiProperty({ type: 'string' })
   refreshToken: string;
 }
-
-export class TokenResultDto {
-  data: Tokens;
-}
