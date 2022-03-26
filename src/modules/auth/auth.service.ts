@@ -24,7 +24,7 @@ import {
   ResendMailQueryDto,
   ResetPasswordDto,
   SignupDto,
-  TokenDto,
+  Tokens,
   VerifyUserQueryDto,
 } from './dtos';
 
@@ -36,7 +36,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async login(dto: LoginDto): Promise<TokenDto> {
+  async login(dto: LoginDto): Promise<Tokens> {
     dto.validate();
 
     const { email, password } = dto;
@@ -54,7 +54,7 @@ export class AuthService {
     return this.getTokens(user);
   }
 
-  async loginFB(user: User): Promise<TokenDto> {
+  async loginFB(user: User): Promise<Tokens> {
     return this.getTokens(user);
   }
 
@@ -139,7 +139,7 @@ export class AuthService {
     await this.mailService.sendForgetPasswordMail(email, token);
   }
 
-  async refreshToken(id: number, refreshToken: string): Promise<TokenDto> {
+  async refreshToken(id: number, refreshToken: string): Promise<Tokens> {
     const user = await this.userService.findOneById(id);
 
     const rtMatches = await bcrypt.compare(refreshToken, user.refreshToken);
@@ -150,7 +150,7 @@ export class AuthService {
     return await this.getTokens(user);
   }
 
-  async getTokens(user: User): Promise<TokenDto> {
+  async getTokens(user: User): Promise<Tokens> {
     const { id, email, refreshToken: oldRt } = user;
 
     let accessToken: string;

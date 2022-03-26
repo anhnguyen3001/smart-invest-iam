@@ -7,7 +7,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser, GetUserId, Public, RtGuard } from 'src/common';
 import { User } from 'src/entities';
 import { AuthService } from './auth.service';
@@ -17,7 +17,7 @@ import {
   ResendMailQueryDto,
   ResetPasswordDto,
   SignupDto,
-  TokenDto,
+  Tokens,
   VerifyUserQueryDto,
 } from './dtos';
 import { FBAuthGuard } from './guards';
@@ -33,12 +33,15 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(200)
+  @ApiOperation({
+    summary: 'Login',
+  })
   @ApiOkResponse({
     status: 200,
-    type: TokenDto,
+    type: Tokens,
     description: 'Login successfully',
   })
-  async login(@Body() loginDto: LoginDto): Promise<TokenDto> {
+  async login(@Body() loginDto: LoginDto): Promise<Tokens> {
     return this.authService.login(loginDto);
   }
 
@@ -52,7 +55,7 @@ export class AuthController {
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook/redirect')
-  async redirectFB(@GetUser() user: User): Promise<TokenDto> {
+  async redirectFB(@GetUser() user: User): Promise<Tokens> {
     return this.authService.loginFB(user);
   }
 
@@ -63,6 +66,9 @@ export class AuthController {
 
   @Public()
   @Post('signup')
+  @ApiOperation({
+    summary: 'Sign up',
+  })
   @ApiOkResponse({ description: 'Sign up successfully' })
   async signup(@Body() dto: SignupDto): Promise<void> {
     await this.authService.signup(dto);
@@ -70,12 +76,18 @@ export class AuthController {
 
   @Public()
   @Get('verify')
+  @ApiOperation({
+    summary: 'Verify account',
+  })
   async verifyUser(@Query() query: VerifyUserQueryDto): Promise<void> {
     await this.authService.verifyUser(query);
   }
 
   @Public()
   @Post('forget-password')
+  @ApiOperation({
+    summary: 'Forget password',
+  })
   @ApiOkResponse({ description: 'Forget password successfully' })
   async forgetPassword(@Body() dto: ForgetPasswordDto): Promise<void> {
     await this.authService.forgetPassword(dto);
@@ -83,6 +95,9 @@ export class AuthController {
 
   @Public()
   @Post('reset-password')
+  @ApiOperation({
+    summary: 'Reset password',
+  })
   @ApiOkResponse({ description: 'Reset password successfully' })
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
     await this.authService.resetPassword(dto);
@@ -90,6 +105,9 @@ export class AuthController {
 
   @Public()
   @Get('resend-mail')
+  @ApiOperation({
+    summary: 'Resend email',
+  })
   async resendMail(@Query() query: ResendMailQueryDto): Promise<void> {
     await this.authService.resendMail(query);
   }
@@ -99,7 +117,7 @@ export class AuthController {
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<TokenDto> {
+  ): Promise<Tokens> {
     return this.authService.refreshToken(id, refreshToken);
   }
 }
