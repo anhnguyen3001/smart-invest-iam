@@ -19,7 +19,9 @@ export class UserService {
   async create(data: CreateUser): Promise<User> {
     const { password, method = MethodEnum.local, ...rest } = data;
 
-    const existedUser = await this.findOneByEmail(data.email);
+    const existedUser = await this.userRepo.findOne({
+      where: [{ email: data.email }, { username: data.username }],
+    });
     if (existedUser) {
       throw new UserExistedException();
     }
