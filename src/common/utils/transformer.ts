@@ -1,35 +1,18 @@
 import {
   ClassConstructor,
-  classToPlain,
   ClassTransformOptions,
   plainToClass,
 } from 'class-transformer';
-import { ApiCode } from '../constants';
-import { BaseResponse } from '../dtos';
 
-export interface IResponse {
-  code?: string;
-  message?: string;
-  data?: unknown;
-}
-
-export const getBaseResponse = (
-  response: IResponse,
+export const getBaseResponse = <T>(
+  data: T,
   dataCls: ClassConstructor<unknown>,
   classTransformOptions?: ClassTransformOptions,
-): IResponse => {
-  const instance = new BaseResponse<unknown>();
+): T => {
+  const convertedData = plainToClass(dataCls, Object.assign({}, data), {
+    excludeExtraneousValues: true,
+    ...(classTransformOptions || {}),
+  }) as T;
 
-  instance.code = response.code || ApiCode[200].DEFAULT.code;
-  instance.message = response.message || ApiCode[200].DEFAULT.description;
-
-  if (response.data) {
-    instance.data = plainToClass(
-      dataCls,
-      Object.assign({}, response.data),
-      classTransformOptions,
-    );
-  }
-
-  return classToPlain(instance);
+  return convertedData;
 };

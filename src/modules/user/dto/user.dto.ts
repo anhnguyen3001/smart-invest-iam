@@ -1,7 +1,16 @@
-import { Type } from 'class-transformer';
-import { User } from 'src/entities';
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
-export class ResultUserDto {
-  @Type(() => User)
-  user: User;
+export class UserDto {
+  @Expose()
+  @ApiProperty({ type: 'string' })
+  email: string;
+
+  @Expose()
+  @ApiProperty({ type: 'string' })
+  username: string;
+
+  @Expose()
+  @ApiProperty({ type: 'string' })
+  avatar?: string;
 }

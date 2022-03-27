@@ -59,9 +59,9 @@ export class AuthController {
     return this.authService.loginFB(user);
   }
 
-  @Public()
   @Get('logout')
   async logout(@GetUserId() id: number): Promise<void> {
+    console.log('id ', id);
     await this.authService.logout(id);
   }
 

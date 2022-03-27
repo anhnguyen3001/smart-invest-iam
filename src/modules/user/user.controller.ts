@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { GetUserId } from 'src/common';
-import { User } from 'src/entities';
-import { ChangePasswordDto, UpdateUserDto } from './dto';
+import { getBaseResponse, GetUserId } from 'src/common';
+import { ChangePasswordDto, UpdateUserDto, UserDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -18,23 +17,28 @@ export class UserController {
     summary: 'Get user info',
   })
   @ApiOkResponse({
-    type: User,
+    type: UserDto,
     description: 'Get user info successfully',
   })
-  async getUserInfo(@GetUserId() id: number): Promise<User> {
-    return this.userService.findOneById(id);
+  async getUserInfo(@GetUserId() id: number): Promise<UserDto> {
+    const user = await this.userService.findOneById(id);
+    return getBaseResponse(user, UserDto);
   }
 
   @Patch('update-info')
   @ApiOperation({
     summary: 'Update user info',
   })
-  @ApiOkResponse({ type: User, description: 'Update user info successfully' })
+  @ApiOkResponse({
+    type: UserDto,
+    description: 'Update user info successfully',
+  })
   async updateInfo(
     @GetUserId() id: number,
     @Body() dto: UpdateUserDto,
-  ): Promise<User> {
-    return this.userService.update(id, dto);
+  ): Promise<UserDto> {
+    const user = this.userService.update(id, dto);
+    return getBaseResponse(user, UserDto);
   }
 
   @Post('change-password')
