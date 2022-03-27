@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { LoginMethodEnum } from '../user.type';
 
 export class UserDto {
   @Expose()
@@ -13,4 +14,8 @@ export class UserDto {
   @Expose()
   @ApiProperty({ type: 'string' })
   avatar?: string;
+
+  @Expose()
+  @ApiProperty({ enum: LoginMethodEnum })
+  method?: LoginMethodEnum;
 }

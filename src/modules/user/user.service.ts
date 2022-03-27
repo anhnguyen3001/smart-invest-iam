@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { hashData } from 'src/common';
-import { MethodEnum, User } from 'src/entities';
+import { User } from 'src/entities';
 import { FindConditions, Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto';
 import {
@@ -10,14 +10,14 @@ import {
   UserExistedException,
   LackPasswordException,
 } from './user.exception';
-import { CreateUser } from './user.type';
+import { CreateUser, LoginMethodEnum } from './user.type';
 
 @Injectable()
 export class UserService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
   async create(data: CreateUser): Promise<User> {
-    const { password, method = MethodEnum.local, ...rest } = data;
+    const { password, method = LoginMethodEnum.local, ...rest } = data;
 
     const existedUser = await this.userRepo.findOne({
       where: [{ email: data.email }, { username: data.username }],
@@ -27,7 +27,7 @@ export class UserService {
     }
 
     let hashPassword;
-    if (method === MethodEnum.local) {
+    if (method === LoginMethodEnum.local) {
       if (!password) throw new LackPasswordException();
 
       hashPassword = await hashData(password);

@@ -1,13 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { LoginMethodEnum } from 'src/modules/user/user.type';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-
-export enum MethodEnum {
-  local = 'local',
-  facebook = 'facebook',
-  google = 'google',
-}
-
 @Entity('users')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -32,6 +26,6 @@ export class User extends BaseEntity {
   @Column({ length: 255, nullable: true })
   refreshToken?: string;
 
-  @Column({ enum: MethodEnum })
-  method?: MethodEnum = MethodEnum.local;
+  @Column({ enum: LoginMethodEnum })
+  method?: LoginMethodEnum = LoginMethodEnum.local;
 }

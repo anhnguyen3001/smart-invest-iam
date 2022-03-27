@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy } from 'passport-facebook';
+import { Profile, Strategy } from 'passport-facebook-token-nest';
 import { STRATEGY } from 'src/common';
 import { configService } from 'src/config';
 import { AuthService } from '../auth.service';
@@ -22,11 +22,11 @@ export class FacebookStrategy extends PassportStrategy(
   }
 
   async validate(_: string, __: string, profile: Profile): Promise<any> {
-    const { emails, displayName, photos } = profile;
+    const { emails, name, photos } = profile;
 
     const socialInfo: LoginSocialInfo = {
       email: emails[0].value,
-      username: displayName,
+      username: name,
       avatar: photos[0].value,
     };
 

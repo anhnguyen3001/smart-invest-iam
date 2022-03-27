@@ -7,13 +7,19 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { GetUser, GetUserId, Public, RtGuard } from 'src/common';
 import { User } from 'src/entities';
 import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
   LoginDto,
+  LoginFacebookDto,
   ResendMailQueryDto,
   ResetPasswordDto,
   ResetPasswordQuery,
@@ -49,14 +55,8 @@ export class AuthController {
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
-  async loginFB(): Promise<void> {
-    console.log('abc');
-  }
-
-  @Public()
-  @UseGuards(FBAuthGuard)
-  @Get('facebook/redirect')
-  async redirectFB(@GetUser() user: User): Promise<Tokens> {
+  @ApiQuery({ type: LoginFacebookDto })
+  async loginFB(@GetUser() user: User): Promise<Tokens> {
     return this.authService.loginFB(user);
   }
 

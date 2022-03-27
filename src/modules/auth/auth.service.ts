@@ -5,16 +5,17 @@ import { hashData } from 'src/common';
 import { configService } from 'src/config';
 import { User } from 'src/entities';
 import { MailService } from '../external/mail/mail.service';
+import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
+import { LoginMethodEnum } from '../user/user.type';
 import {
   AccessDeniedException,
   EmailValidatedException,
-  InvalidTokenException,
-  UnAuthorizedException,
   InvalidCredentialException,
+  InvalidTokenException,
   UserNotFoundException,
 } from './auth.exception';
-import { JWT_SECRET_KEY, LoginSocialInfo, JWTPayload } from './common';
+import { JWTPayload, JWT_SECRET_KEY, LoginSocialInfo } from './common';
 import {
   ForgetPasswordDto,
   LoginDto,
@@ -41,13 +42,13 @@ export class AuthService {
     const { email, password } = dto;
 
     const user = await this.userService.findOne({ email, isVerified: true });
-    if (!user) {
-      throw new UnAuthorizedException();
+    if (!user || !user.password) {
+      throw new InvalidCredentialException();
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
-      throw new UnAuthorizedException();
+      throw new InvalidCredentialException();
     }
 
     return this.getTokens(user);
@@ -245,14 +246,14 @@ export class AuthService {
       currentUser = await this.userService.create({
         ...user,
         isVerified: true,
+        method: LoginMethodEnum.facebook,
       });
+    } else {
+      const { method } = currentUser;
+      if (method !== LoginMethodEnum.facebook) {
+        throw new UserExistedException();
+      }
     }
-    // else {
-    //   const { method } = currentUser;
-    //   if (method !== MethodEnum.facebook) {
-    //     throw new UserExistedException();
-    //   }
-    // }
 
     return currentUser;
   }
