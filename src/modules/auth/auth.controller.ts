@@ -16,6 +16,7 @@ import {
   LoginDto,
   ResendMailQueryDto,
   ResetPasswordDto,
+  ResetPasswordQuery,
   SignupDto,
   Tokens,
   VerifyUserQueryDto,
@@ -100,8 +101,11 @@ export class AuthController {
     summary: 'Reset password',
   })
   @ApiOkResponse({ description: 'Reset password successfully' })
-  async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
-    await this.authService.resetPassword(dto);
+  async resetPassword(
+    @Query() query: ResetPasswordQuery,
+    @Body() dto: ResetPasswordDto,
+  ): Promise<void> {
+    await this.authService.resetPassword(query, dto);
   }
 
   @Public()

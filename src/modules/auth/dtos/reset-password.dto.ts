@@ -3,6 +3,17 @@ import { IsString, Matches } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common';
 import { PasswordNotMatchException } from 'src/modules/user/user.exception';
 
+export class ResetPasswordQuery {
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  @Matches(PATTERN_VALIDATION.email)
+  email: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  token: string;
+}
+
 export class ResetPasswordDto {
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
@@ -15,13 +26,6 @@ export class ResetPasswordDto {
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
   confirmPassword: string;
-
-  @IsString()
-  @Matches(PATTERN_VALIDATION.email)
-  email: string;
-
-  @IsString()
-  token: string;
 
   validate() {
     if (this.newPassword !== this.confirmPassword) {

@@ -21,6 +21,7 @@ import {
   MailEnum,
   ResendMailQueryDto,
   ResetPasswordDto,
+  ResetPasswordQuery,
   SignupDto,
   Tokens,
   VerifyUserQueryDto,
@@ -97,10 +98,14 @@ export class AuthService {
     await this.sendForgetPasswordMail(email);
   }
 
-  async resetPassword(data: ResetPasswordDto): Promise<void> {
+  async resetPassword(
+    query: ResetPasswordQuery,
+    data: ResetPasswordDto,
+  ): Promise<void> {
     data.validate();
 
-    const { newPassword, email, token } = data;
+    const { email, token } = query;
+    const { newPassword } = data;
 
     await this.validateTokenMail(email, token);
 
