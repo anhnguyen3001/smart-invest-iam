@@ -17,18 +17,14 @@ export class ResetPasswordQuery {
 export class ResetPasswordDto {
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
-  oldPassword: string;
-
-  @ApiProperty({ type: 'string' })
-  @Matches(PATTERN_VALIDATION.password)
-  newPassword: string;
+  password: string;
 
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
   confirmPassword: string;
 
   validate() {
-    if (this.newPassword !== this.confirmPassword) {
+    if (this.password !== this.confirmPassword) {
       throw new PasswordNotMatchException();
     }
   }

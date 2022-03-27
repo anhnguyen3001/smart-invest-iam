@@ -105,7 +105,7 @@ export class AuthService {
     data.validate();
 
     const { email, token } = query;
-    const { newPassword } = data;
+    const { password } = data;
 
     await this.validateTokenMail(email, token);
 
@@ -114,8 +114,8 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    const password = await hashData(newPassword);
-    await this.userService.update(user.id, { password });
+    const hashPassword = await hashData(password);
+    await this.userService.update(user.id, { password: hashPassword });
   }
 
   async resendMail(data: ResendMailQueryDto): Promise<void> {
