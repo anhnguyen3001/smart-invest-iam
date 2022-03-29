@@ -21,3 +21,8 @@ export class LoginDto {
     }
   }
 }
+
+export class LoginSocialDto {
+  @ApiProperty({ type: 'string' })
+  access_token: string;
+}

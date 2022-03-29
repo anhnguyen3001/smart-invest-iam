@@ -19,7 +19,7 @@ import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
   LoginDto,
-  LoginFacebookDto,
+  LoginSocialDto,
   ResendMailQueryDto,
   ResetPasswordDto,
   ResetPasswordQuery,
@@ -27,7 +27,7 @@ import {
   Tokens,
   VerifyUserQueryDto,
 } from './dtos';
-import { FBAuthGuard } from './guards';
+import { FBAuthGuard, GoogleAuthGuard } from './guards';
 
 @ApiTags('Auth')
 @Controller({
@@ -55,14 +55,21 @@ export class AuthController {
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
-  @ApiQuery({ type: LoginFacebookDto })
+  @ApiQuery({ type: LoginSocialDto })
   async loginFB(@GetUser() user: User): Promise<Tokens> {
-    return this.authService.loginFB(user);
+    return this.authService.loginSocial(user);
+  }
+
+  @Public()
+  @UseGuards(GoogleAuthGuard)
+  @Get('google')
+  @ApiQuery({ type: LoginSocialDto })
+  async loginGoogle(@GetUser() user: User): Promise<Tokens> {
+    return this.authService.loginSocial(user);
   }
 
   @Get('logout')
   async logout(@GetUserId() id: number): Promise<void> {
-    console.log('id ', id);
     await this.authService.logout(id);
   }
 

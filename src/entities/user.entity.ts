@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { LoginMethodEnum } from 'src/modules/user/user.type';
+import { LoginMethodEnum } from 'src/common';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 @Entity('users')

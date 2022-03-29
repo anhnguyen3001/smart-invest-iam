@@ -1,5 +1,4 @@
 export * from './forget-password.dto';
-export * from './login-facebook.dto';
 export * from './login.dto';
 export * from './resend-mail.dto';
 export * from './reset-password.dto';

@@ -7,3 +7,4 @@ export * from './guards';
 export * from './pipes';
 export * from './swagger';
 export * from './utils';
+export * from './types';

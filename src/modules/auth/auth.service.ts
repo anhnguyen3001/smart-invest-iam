@@ -7,7 +7,6 @@ import { User } from 'src/entities';
 import { MailService } from '../external/mail/mail.service';
 import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
-import { LoginMethodEnum } from '../user/user.type';
 import {
   AccessDeniedException,
   EmailValidatedException,
@@ -54,7 +53,7 @@ export class AuthService {
     return this.getTokens(user);
   }
 
-  async loginFB(user: User): Promise<Tokens> {
+  async loginSocial(user: User): Promise<Tokens> {
     return this.getTokens(user);
   }
 
@@ -236,25 +235,21 @@ export class AuthService {
     return this.userService.findOne({ id, email });
   }
 
-  async validateFBUser(user: LoginSocialInfo): Promise<User> {
-    const { email } = user;
+  async findOrCreateSocialUser(info: LoginSocialInfo): Promise<User> {
+    const { email } = info;
 
-    let currentUser = await this.userService.findOneByEmail(email);
+    let user = await this.userService.findOneByEmail(email);
 
-    if (!currentUser) {
+    if (!user) {
       // User login first time
-      currentUser = await this.userService.create({
-        ...user,
+      user = await this.userService.create({
+        ...info,
         isVerified: true,
-        method: LoginMethodEnum.facebook,
       });
-    } else {
-      const { method } = currentUser;
-      if (method !== LoginMethodEnum.facebook) {
-        throw new UserExistedException();
-      }
+    } else if (user.method !== info.method) {
+      throw new UserExistedException();
     }
 
-    return currentUser;
+    return user;
   }
 }

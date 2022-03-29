@@ -1,34 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy } from 'passport-facebook-token-nest';
+import { Profile, Strategy } from 'passport-google-token';
 import { LoginMethodEnum, STRATEGY } from 'src/common';
 import { configService } from 'src/config';
 import { AuthService } from '../auth.service';
 import { LoginSocialInfo } from '../common';
 
 @Injectable()
-export class FacebookStrategy extends PassportStrategy(
+export class GoogleStrategy extends PassportStrategy(
   Strategy,
-  STRATEGY.facebook,
+  STRATEGY.google,
 ) {
   constructor(private readonly authService: AuthService) {
     super({
-      clientID: configService.getValue('FB_APP_ID'),
-      clientSecret: configService.getValue('FB_APP_SECRET'),
-      callbackURL: configService.getValue('FB_APP_CALLBACK'),
-      scope: 'email',
-      profileFields: ['emails', 'displayName', 'photos'],
+      clientID: configService.getValue('GOOGLE_CLIENT_ID'),
+      clientSecret: configService.getValue('GOOGLE_CLIENT_SECRET'),
+      callbackURL: configService.getValue('GOOGLE_CLIENT_CALLBACK'),
     });
   }
 
   async validate(_: string, __: string, profile: Profile): Promise<any> {
-    const { emails, name, photos } = profile;
+    const { emails, displayName, _json } = profile;
 
     const socialInfo: LoginSocialInfo = {
       email: emails[0].value,
-      username: name,
-      avatar: photos[0].value,
-      method: LoginMethodEnum.facebook,
+      username: displayName,
+      avatar: _json.picture,
+      method: LoginMethodEnum.google,
     };
 
     return this.authService.findOrCreateSocialUser(socialInfo);
