@@ -3,16 +3,31 @@ import {
   ClassTransformOptions,
   plainToClass,
 } from 'class-transformer';
+import { ApiCode } from '../constants';
+import { BaseResponse } from '../dtos';
+
+interface IResponse {
+  code?: string;
+  message?: string;
+  data?: unknown;
+  details?: unknown;
+}
 
 export const getBaseResponse = <T>(
-  data: T,
-  dataCls: ClassConstructor<unknown>,
+  response: IResponse,
+  dataCls: ClassConstructor<T>,
   classTransformOptions?: ClassTransformOptions,
-): T => {
-  const convertedData = plainToClass(dataCls, Object.assign({}, data), {
-    excludeExtraneousValues: true,
-    ...(classTransformOptions || {}),
-  }) as T;
+) => {
+  const instance = new BaseResponse<T>();
+  instance.code = response.code || ApiCode[200].DEFAULT.code;
+  instance.message = response.message || ApiCode[200].DEFAULT.description;
 
-  return convertedData;
+  if (response.data) {
+    instance.data = plainToClass(dataCls, Object.assign({}, response.data), {
+      excludeExtraneousValues: true,
+      ...(classTransformOptions || {}),
+    });
+  }
+
+  return instance;
 };

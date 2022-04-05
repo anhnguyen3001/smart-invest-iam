@@ -12,8 +12,17 @@ import {
   ApiOperation,
   ApiTags,
   ApiQuery,
+  ApiExtraModels,
 } from '@nestjs/swagger';
-import { GetUser, GetUserId, Public, RtGuard } from 'src/common';
+import {
+  ApiOkBaseResponse,
+  BaseResponse,
+  getBaseResponse,
+  GetUser,
+  GetUserId,
+  Public,
+  RtGuard,
+} from 'src/common';
 import { User } from 'src/entities';
 import { AuthService } from './auth.service';
 import {
@@ -34,6 +43,7 @@ import { FBAuthGuard, GoogleAuthGuard } from './guards';
   path: 'auth',
   version: '1',
 })
+@ApiExtraModels(BaseResponse, Tokens)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -43,19 +53,24 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login',
   })
-  @ApiOkResponse({
+  @ApiOkBaseResponse(Tokens, {
     status: 200,
-    type: Tokens,
     description: 'Login successfully',
   })
-  async login(@Body() loginDto: LoginDto): Promise<Tokens> {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto): Promise<BaseResponse<Tokens>> {
+    const tokens = await this.authService.login(loginDto);
+
+    return getBaseResponse<Tokens>({ data: tokens }, Tokens);
   }
 
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
   @ApiQuery({ type: LoginSocialDto })
+  @ApiOkBaseResponse(Tokens, {
+    status: 200,
+    description: 'Login facebook successfully',
+  })
   async loginFB(@GetUser() user: User): Promise<Tokens> {
     return this.authService.loginSocial(user);
   }
@@ -64,6 +79,10 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google')
   @ApiQuery({ type: LoginSocialDto })
+  @ApiOkBaseResponse(Tokens, {
+    status: 200,
+    description: 'Login google successfully',
+  })
   async loginGoogle(@GetUser() user: User): Promise<Tokens> {
     return this.authService.loginSocial(user);
   }
@@ -126,10 +145,14 @@ export class AuthController {
 
   @UseGuards(RtGuard)
   @Get('refresh-token')
+  @ApiOkBaseResponse(Tokens, {
+    description: 'Refresh token successfully',
+  })
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<Tokens> {
-    return this.authService.refreshToken(id, refreshToken);
+  ): Promise<BaseResponse<Tokens>> {
+    const tokens = await this.authService.refreshToken(id, refreshToken);
+    return getBaseResponse({ data: tokens }, Tokens);
   }
 }
