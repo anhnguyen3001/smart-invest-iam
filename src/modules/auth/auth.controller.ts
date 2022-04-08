@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
   ApiQuery,
-  ApiExtraModels,
+  ApiTags,
 } from '@nestjs/swagger';
 import {
   ApiOkBaseResponse,
@@ -20,6 +20,7 @@ import {
   getBaseResponse,
   GetUser,
   GetUserId,
+  Identity,
   Public,
   RtGuard,
 } from 'src/common';
@@ -43,7 +44,7 @@ import { FBAuthGuard, GoogleAuthGuard } from './guards';
   path: 'auth',
   version: '1',
 })
-@ApiExtraModels(BaseResponse, Tokens)
+@ApiExtraModels(BaseResponse, Tokens, Identity)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -68,7 +69,6 @@ export class AuthController {
   @Get('facebook')
   @ApiQuery({ type: LoginSocialDto })
   @ApiOkBaseResponse(Tokens, {
-    status: 200,
     description: 'Login facebook successfully',
   })
   async loginFB(@GetUser() user: User): Promise<Tokens> {
@@ -80,7 +80,6 @@ export class AuthController {
   @Get('google')
   @ApiQuery({ type: LoginSocialDto })
   @ApiOkBaseResponse(Tokens, {
-    status: 200,
     description: 'Login google successfully',
   })
   async loginGoogle(@GetUser() user: User): Promise<Tokens> {
@@ -97,9 +96,13 @@ export class AuthController {
   @ApiOperation({
     summary: 'Sign up',
   })
+  @ApiOkBaseResponse(Identity, {
+    description: 'Sign up successfully',
+  })
   @ApiOkResponse({ description: 'Sign up successfully' })
-  async signup(@Body() dto: SignupDto): Promise<void> {
-    await this.authService.signup(dto);
+  async signup(@Body() dto: SignupDto): Promise<BaseResponse<Identity>> {
+    const user = await this.authService.signup(dto);
+    return getBaseResponse({ data: { id: user.id } }, Identity);
   }
 
   @Public()
@@ -116,9 +119,12 @@ export class AuthController {
   @ApiOperation({
     summary: 'Forget password',
   })
-  @ApiOkResponse({ description: 'Forget password successfully' })
-  async forgetPassword(@Body() dto: ForgetPasswordDto): Promise<void> {
-    await this.authService.forgetPassword(dto);
+  @ApiOkBaseResponse(Identity, { description: 'Forget password successfully' })
+  async forgetPassword(
+    @Body() dto: ForgetPasswordDto,
+  ): Promise<BaseResponse<Identity>> {
+    const user = await this.authService.forgetPassword(dto);
+    return getBaseResponse({ data: { id: user.id } }, Identity);
   }
 
   @Public()

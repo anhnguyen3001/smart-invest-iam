@@ -1,32 +1,12 @@
-import { ValidationPipe, ValidationPipeOptions } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter, exceptionFactoryValidationPipe } from './common';
-import { configService } from './config';
-
-const DEFAULT_VALIDATION_PIPE: ValidationPipeOptions = {
-  transform: true,
-  whitelist: true,
-  exceptionFactory: exceptionFactoryValidationPipe,
-  stopAtFirstError: true,
-};
+import { configNestApp, configService } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(bodyParser.json({ limit: '10mb' }));
-
-  app.enableCors({
-    origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
-
-  app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe(DEFAULT_VALIDATION_PIPE));
-  app.useGlobalFilters(new AllExceptionsFilter());
+  configNestApp(app);
 
   // Swagger
   const options = new DocumentBuilder()

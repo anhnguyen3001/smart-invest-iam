@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { hashData, LoginMethodEnum } from 'src/common';
 import { User } from 'src/entities';
-import { FindConditions, Repository } from 'typeorm';
+import { FindConditions, Not, Repository } from 'typeorm';
 import { ChangePasswordDto, CreateUserDto } from './dto';
 import {
   OldPasswordWrongException,
@@ -69,8 +69,12 @@ export class UserService {
     });
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    return this.userRepo.findOne({ email });
+  async findOneByLocalEmail(email: string): Promise<User> {
+    return this.userRepo.findOne({ email, method: LoginMethodEnum.local });
+  }
+
+  async findOneBySocialEmail(email: string): Promise<User> {
+    return this.userRepo.findOne({ email, method: Not(LoginMethodEnum.local) });
   }
 
   async findOneById(id: number): Promise<User> {

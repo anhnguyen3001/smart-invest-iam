@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
-import { useNestAppConfig } from '../src/modules/core';
+import { configNestApp } from '../src/config';
 
 export async function createTestingApplication(): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -10,7 +10,7 @@ export async function createTestingApplication(): Promise<INestApplication> {
 
   const app = moduleFixture.createNestApplication();
 
-  useNestAppConfig(app);
+  configNestApp(app);
 
   return app;
 }

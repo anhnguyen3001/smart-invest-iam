@@ -21,8 +21,8 @@
     "prepare": "husky install",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:create": "yarn typeorm migration:create -n",
-    "migration:up": "yarn typeorm migration:run",
-    "migration:down": "yarn typeorm migration:revert"
+    "migration:up": "yarn build & yarn typeorm migration:run",
+    "migration:down": "yarn build & yarn typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",

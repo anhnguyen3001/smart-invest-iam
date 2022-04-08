@@ -63,6 +63,10 @@ export const ApiCode = {
       code: '1006',
       description: 'Lack of password to create account',
     },
+    RECENTLY_SEND_MAIL: {
+      code: '1007',
+      description: 'Mail have recently been sent',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {

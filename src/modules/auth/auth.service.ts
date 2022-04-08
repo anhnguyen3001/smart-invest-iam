@@ -5,6 +5,8 @@ import { hashData } from 'src/common';
 import { configService } from 'src/config';
 import { User } from 'src/entities';
 import { MailService } from '../external/mail/mail.service';
+import { MailTokenTypeEnum } from '../mail-token';
+import { MailTokenService } from '../mail-token/mail-token.service';
 import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
 import {
@@ -33,6 +35,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly mailTokenService: MailTokenService,
   ) {}
 
   async login(dto: LoginDto): Promise<Tokens> {
@@ -65,7 +68,7 @@ export class AuthService {
     const { confirmPassword, ...restDto } = dto;
     const user = await this.userService.create(restDto);
 
-    await this.sendVerifyUserMail(user.email);
+    await this.sendVerifyUserMail(user, user.email);
 
     return user;
   }
@@ -75,7 +78,7 @@ export class AuthService {
 
     await this.validateTokenMail(email, token);
 
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -87,15 +90,16 @@ export class AuthService {
     this.userService.update(user.id, { isVerified: true });
   }
 
-  async forgetPassword(data: ForgetPasswordDto): Promise<void> {
+  async forgetPassword(data: ForgetPasswordDto): Promise<User> {
     const { email } = data;
 
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
-
-    await this.sendForgetPasswordMail(email);
+    console.log('userId pass ', user.id);
+    await this.sendForgetPasswordMail(user, email);
+    return user;
   }
 
   async resetPassword(
@@ -109,7 +113,7 @@ export class AuthService {
 
     await this.validateTokenMail(email, token);
 
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -121,26 +125,35 @@ export class AuthService {
   async resendMail(data: ResendMailQueryDto): Promise<void> {
     const { type, email } = data;
 
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
 
     if (type === MailEnum.register) {
-      await this.sendVerifyUserMail(email);
+      await this.sendVerifyUserMail(user, email);
     } else if (type === MailEnum.resetPassword) {
-      await this.sendForgetPasswordMail(email);
+      await this.sendForgetPasswordMail(user, email);
     }
   }
 
-  async sendVerifyUserMail(email: string): Promise<void> {
-    const token = await this.generateMailToken(email);
+  async sendVerifyUserMail(user: User, email: string): Promise<void> {
+    const token = await this.mailTokenService.generate(
+      user,
+      email,
+      MailTokenTypeEnum.verifyUser,
+    );
     await this.mailService.sendVerifyUserMail(email, token);
   }
 
-  async sendForgetPasswordMail(email: string): Promise<void> {
-    const token = await this.generateMailToken(email);
-    await this.mailService.sendForgetPasswordMail(email, token);
+  async sendForgetPasswordMail(user: User, email: string): Promise<void> {
+    const token = await this.mailTokenService.generate(
+      user,
+      email,
+      MailTokenTypeEnum.forgetPassword,
+    );
+    console.log('token ', token);
+    // await this.mailService.sendForgetPasswordMail(email, token);
   }
 
   async refreshToken(id: number, refreshToken: string): Promise<Tokens> {
@@ -236,9 +249,9 @@ export class AuthService {
   }
 
   async findOrCreateSocialUser(info: LoginSocialInfo): Promise<User> {
-    const { email } = info;
+    const { email, method } = info;
 
-    let user = await this.userService.findOneByEmail(email);
+    let user = await this.userService.findOne({ email });
 
     if (!user) {
       // User login first time
@@ -246,7 +259,7 @@ export class AuthService {
         ...info,
         isVerified: true,
       });
-    } else if (user.method !== info.method) {
+    } else if (method !== info.method) {
       throw new UserExistedException();
     }
 

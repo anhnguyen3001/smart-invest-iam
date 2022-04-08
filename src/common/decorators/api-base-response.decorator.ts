@@ -14,17 +14,12 @@ export const ApiOkBaseResponse = <TModel extends Type<any>>(
     ApiOkResponse({
       ...responseOptions,
       schema: {
-        allOf: [
-          { $ref: getSchemaPath(BaseResponse) },
-          {
-            properties: {
-              results: {
-                type: 'array',
-                items: { $ref: getSchemaPath(model) },
-              },
-            },
+        $ref: getSchemaPath(BaseResponse),
+        properties: {
+          data: {
+            $ref: getSchemaPath(model),
           },
-        ],
+        },
       },
     }),
   );

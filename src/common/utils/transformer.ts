@@ -10,7 +10,6 @@ interface IResponse {
   code?: string;
   message?: string;
   data?: unknown;
-  details?: unknown;
 }
 
 export const getBaseResponse = <T>(
@@ -25,7 +24,7 @@ export const getBaseResponse = <T>(
   if (response.data) {
     instance.data = plainToClass(dataCls, Object.assign({}, response.data), {
       excludeExtraneousValues: true,
-      ...(classTransformOptions || {}),
+      ...classTransformOptions,
     });
   }
 

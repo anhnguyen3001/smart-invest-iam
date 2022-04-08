@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, Matches } from 'class-validator';
+import { IsEnum, IsNumber, IsString, Matches } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common';
 
 export enum MailEnum {

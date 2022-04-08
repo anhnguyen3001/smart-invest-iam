@@ -1,13 +1,15 @@
 import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-export class BaseEntity {
+export class CreatedEntity {
   @CreateDateColumn({
     type: 'timestamp',
     precision: 6,
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   createdAt: string;
+}
 
+export class BaseEntity extends CreatedEntity {
   @UpdateDateColumn({
     type: 'timestamp',
     precision: 6,

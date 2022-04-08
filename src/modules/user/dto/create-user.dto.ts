@@ -3,7 +3,7 @@ import { LoginMethodEnum } from 'src/common';
 export class CreateUserDto {
   email: string;
   username: string;
-  isVerified?: boolean;
+  isVerified?: boolean = false;
   password?: string;
-  method?: LoginMethodEnum;
+  method?: LoginMethodEnum = LoginMethodEnum.local;
 }

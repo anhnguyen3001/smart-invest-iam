@@ -3,7 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AtGuard } from './common';
 import { TypeOrmConfigService } from './config';
-import { AuthModule, MailModule, UserModule } from './modules';
+import { AuthModule, MailModule, MailTokenModule, UserModule } from './modules';
 
 @Module({
   imports: [
@@ -11,6 +11,7 @@ import { AuthModule, MailModule, UserModule } from './modules';
     AuthModule,
     UserModule,
     MailModule,
+    MailTokenModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: AtGuard }],
