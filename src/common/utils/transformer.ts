@@ -3,17 +3,11 @@ import {
   ClassTransformOptions,
   plainToClass,
 } from 'class-transformer';
-import { ApiCode } from '../constants';
-import { BaseResponse } from '../dtos';
-
-interface IResponse {
-  code?: string;
-  message?: string;
-  data?: unknown;
-}
+import { ApiCode } from '../constants/apiCode';
+import { BaseResponse } from '../types/api-response.type';
 
 export const getBaseResponse = <T>(
-  response: IResponse,
+  response: Partial<BaseResponse<T>>,
   dataCls: ClassConstructor<T>,
   classTransformOptions?: ClassTransformOptions,
 ) => {

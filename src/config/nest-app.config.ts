@@ -1,20 +1,7 @@
-import {
-  INestApplication,
-  ValidationPipe,
-  ValidationPipeOptions,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import {
-  AllExceptionsFilter,
-  exceptionFactoryValidationPipe,
-} from 'src/common';
-
-const DEFAULT_VALIDATION_PIPE: ValidationPipeOptions = {
-  transform: true,
-  whitelist: true,
-  exceptionFactory: exceptionFactoryValidationPipe,
-  stopAtFirstError: true,
-};
+import { GlobalExceptionsFilter } from 'common/exceptions';
+import { exceptionFactoryValidationPipe } from 'common/utils/exception';
 
 export const configNestApp = (app: INestApplication) => {
   app.use(bodyParser.json({ limit: '10mb' }));
@@ -26,6 +13,13 @@ export const configNestApp = (app: INestApplication) => {
   });
 
   app.enableVersioning();
-  app.useGlobalPipes(new ValidationPipe(DEFAULT_VALIDATION_PIPE));
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: exceptionFactoryValidationPipe,
+      stopAtFirstError: true,
+    }),
+  );
+  app.useGlobalFilters(new GlobalExceptionsFilter());
 };

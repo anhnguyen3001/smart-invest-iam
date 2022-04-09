@@ -1,6 +1,4 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotEnv from 'dotenv';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 dotEnv.config();
 
@@ -13,10 +11,6 @@ class ConfigService {
 
   private toBool(value: string): boolean {
     return value === 'true';
-  }
-
-  private toArray(value: string, delimiter = ','): string[] {
-    return value.split(delimiter);
   }
 
   public getValue(key: string, throwOnMissing = true): string {
@@ -52,24 +46,6 @@ class ConfigService {
 
   public getTimeoutExternal() {
     return this.toNumber(this.getValueOptional('EXTERNAL_TIMEOUT') || '5000');
-  }
-
-  public getTypeOrmConfig(): TypeOrmModuleOptions {
-    return {
-      type: this.getValue('TYPEORM_CONNECTION') as any,
-      host: this.getValue('TYPEORM_HOST'),
-      port: this.toNumber(this.getValue('TYPEORM_PORT')),
-      username: this.getValue('TYPEORM_USERNAME'),
-      password: this.getValue('TYPEORM_PASSWORD'),
-      database: this.getValue('TYPEORM_DATABASE'),
-      entities: this.toArray(this.getValue('TYPEORM_ENTITIES')),
-      migrations: this.toArray(this.getValue('TYPEORM_MIGRATIONS')),
-      cli: {
-        migrationsDir: this.getValue('TYPEORM_MIGRATIONS_DIR'),
-      },
-      charset: 'utf8mb4_unicode_ci',
-      namingStrategy: new SnakeNamingStrategy(),
-    };
   }
 }
 

@@ -67,6 +67,10 @@ export const ApiCode = {
       code: '1007',
       description: 'Mail have recently been sent',
     },
+    RECENTLY_SENT_OTP: {
+      code: '1007',
+      description: 'OTP have recently been sent',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {

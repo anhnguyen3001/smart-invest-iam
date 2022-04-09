@@ -1,17 +1,19 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AtGuard } from './common';
-import { TypeOrmConfigService } from './config';
-import { AuthModule, MailModule, MailTokenModule, UserModule } from './modules';
+import { AuthModule } from 'auth/auth.module';
+import { AtGuard } from 'common/guards/at.guard';
+import { MailModule } from 'external/mail';
+import { OtpModule } from 'otp/otp.module';
+import { UserModule } from 'user/user.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    StorageModule.forRootAsync(),
     AuthModule,
     UserModule,
     MailModule,
-    MailTokenModule,
+    OtpModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: AtGuard }],

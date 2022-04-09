@@ -4,7 +4,7 @@ import {
   ApiResponseOptions,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { BaseResponse } from '../dtos';
+import { BaseResponse } from '../types/api-response.type';
 
 export const ApiOkBaseResponse = <TModel extends Type<any>>(
   model: TModel,
