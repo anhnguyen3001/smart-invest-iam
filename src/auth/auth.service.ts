@@ -2,26 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { hashData } from 'common/utils';
-import { configService } from 'config/config.service';
 import { OtpService } from 'otp/otp.service';
 import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { User } from 'storage/entities/user.entity';
 import { MailService } from '../external/mail/mail.service';
-import { MailTokenService } from '../mail-token/mail-token.service';
 import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
-  EmailValidatedException,
   InvalidCredentialException,
-  InvalidTokenException,
   UserNotFoundException,
+  VerifiedUserException,
 } from './auth.exception';
 import { JWT_SECRET_KEY } from './constants';
 import {
   ForgetPasswordDto,
   LoginDto,
-  MailEnum,
   ResendMailQueryDto,
   ResetPasswordDto,
   ResetPasswordQuery,
@@ -29,7 +25,7 @@ import {
   Tokens,
   VerifyUserQueryDto,
 } from './dtos';
-import { IJWTPayload, ILoginSocialInfo } from './interfaces';
+import { ILoginSocialInfo } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -76,18 +72,17 @@ export class AuthService {
   }
 
   async verifyUser(query: VerifyUserQueryDto): Promise<void> {
-    const { email, token } = query;
-
-    await this.validateTokenMail(email, token);
+    const { email, code } = query;
 
     const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
-
     if (user.isVerified) {
-      throw new EmailValidatedException();
+      throw new VerifiedUserException();
     }
+
+    await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.verifyUser);
 
     this.userService.update(user.id, { isVerified: true });
   }
@@ -99,7 +94,7 @@ export class AuthService {
     if (!user) {
       throw new UserNotFoundException();
     }
-    console.log('userId pass ', user.id);
+
     await this.sendForgetPasswordMail(user);
     return user;
   }
@@ -113,12 +108,12 @@ export class AuthService {
     const { email, token } = query;
     const { password } = data;
 
-    await this.validateTokenMail(email, token);
-
     const user = await this.userService.findOneByLocalEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
+
+    await this.otpService.verifyOtp(user.id, token, OtpTypeEnum.forgetPassword);
 
     const hashPassword = await hashData(password);
     await this.userService.update(user.id, { password: hashPassword });
@@ -132,20 +127,20 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    if (type === MailEnum.register) {
+    if (type === OtpTypeEnum.verifyUser) {
+      if (user.isVerified) {
+        throw new VerifiedUserException();
+      }
+
       await this.sendVerifyUserMail(user);
-    } else if (type === MailEnum.resetPassword) {
+    } else {
       await this.sendForgetPasswordMail(user);
     }
   }
 
   async sendVerifyUserMail(user: User): Promise<void> {
     const otp = await this.otpService.generate(user, OtpTypeEnum.verifyUser);
-    // const token = await this.mailTokenService.generate(
-    //   user,
-    //   email,
-    //   MailTokenTypeEnum.verifyUser,
-    // );
+
     await this.mailService.sendVerifyUserMail(user.email, otp);
   }
 
@@ -154,8 +149,8 @@ export class AuthService {
       user,
       OtpTypeEnum.forgetPassword,
     );
-    console.log('otp ', otp);
-    // await this.mailService.sendForgetPasswordMail(email, otp);
+
+    await this.mailService.sendForgetPasswordMail(user.email, otp);
   }
 
   async refreshToken(id: number, refreshToken: string): Promise<Tokens> {
@@ -218,32 +213,6 @@ export class AuthService {
         secret: JWT_SECRET_KEY.rt,
       },
     );
-  }
-
-  async generateMailToken(email: string): Promise<string> {
-    const token = await this.jwtService.signAsync(
-      { email },
-      { secret: configService.getValue('MAIL_TOKEN_SECRET'), expiresIn: '5m' },
-    );
-
-    return token;
-  }
-
-  async validateTokenMail(email: string, token: string): Promise<void> {
-    let payload: IJWTPayload;
-
-    try {
-      payload = await this.jwtService.verify(token, {
-        secret: configService.getValue('MAIL_TOKEN_SECRET'),
-      });
-    } catch (err) {
-      throw new InvalidTokenException();
-    }
-
-    const { email: encryptedEmail } = payload;
-    if (encryptedEmail !== email) {
-      throw new InvalidCredentialException();
-    }
   }
 
   async validateUser(id: number, email: string): Promise<User> {

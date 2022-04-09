@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOkResponse,
@@ -7,11 +7,10 @@ import {
 } from '@nestjs/swagger';
 import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
 import { GetUserId } from 'common/decorators/get-user-id.decorator';
-import { Public } from 'common/decorators/public.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils';
 import { User } from 'storage/entities/user.entity';
-import { ChangePasswordDto, GetUserDto, UpdateUserDto, UserDto } from './dto';
+import { ChangePasswordDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -19,21 +18,19 @@ import { UserService } from './user.service';
   path: 'user',
   version: '1',
 })
-@ApiExtraModels(BaseResponse, UserDto, User)
+@ApiExtraModels(BaseResponse, User)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Public()
-  @Post('me')
+  @Get('me')
   @ApiOperation({
     summary: 'Get user info',
   })
   @ApiOkBaseResponse(User, {
     description: 'Get user info successfully',
   })
-  async getUserInfo(@Body() dto: GetUserDto): Promise<BaseResponse<User>> {
-    // const user = await this.userService.findOneById(id);
-    const user = await this.userService.findOneByLocalEmail(dto.email);
+  async getUserInfo(@GetUserId() id: number): Promise<BaseResponse<User>> {
+    const user = await this.userService.findOneById(id);
     return getBaseResponse(
       {
         data: user,
@@ -46,15 +43,15 @@ export class UserController {
   @ApiOperation({
     summary: 'Update user info',
   })
-  @ApiOkBaseResponse(UserDto, {
+  @ApiOkBaseResponse(User, {
     description: 'Update user info successfully',
   })
   async updateInfo(
     @GetUserId() id: number,
     @Body() dto: UpdateUserDto,
-  ): Promise<BaseResponse<UserDto>> {
+  ): Promise<BaseResponse<User>> {
     const user = await this.userService.update(id, dto);
-    return getBaseResponse({ data: user }, UserDto);
+    return getBaseResponse({ data: user }, User);
   }
 
   @Post('change-password')

@@ -13,6 +13,10 @@ export class BaseResponse<T> {
   @Expose()
   @ApiResponseProperty()
   data: T;
+
+  @Expose()
+  @ApiResponseProperty()
+  details?: object;
 }
 
 export class Identity {

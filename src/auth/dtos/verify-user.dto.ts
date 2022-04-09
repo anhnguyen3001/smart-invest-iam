@@ -10,5 +10,5 @@ export class VerifyUserQueryDto {
 
   @ApiProperty({ type: 'string' })
   @IsString()
-  token: string;
+  code: string;
 }

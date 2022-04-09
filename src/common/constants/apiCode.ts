@@ -51,9 +51,9 @@ export const ApiCode = {
       code: '1005',
       description: 'Invalid token',
     },
-    EMAIL_VALIDATED: {
+    VERIFIED_USER: {
       code: '1006',
-      description: 'Your email had already been validated',
+      description: 'Your email had already been verified',
     },
     INVALID_CREDENTIALS: {
       code: '1005',
@@ -69,7 +69,15 @@ export const ApiCode = {
     },
     RECENTLY_SENT_OTP: {
       code: '1007',
-      description: 'OTP have recently been sent',
+      description: 'OTP has recently been sent',
+    },
+    EXPIRED_OTP: {
+      code: '1007',
+      description: 'OTP has been expired',
+    },
+    INVALID_OTP: {
+      code: '1007',
+      description: 'Invalid OTP',
     },
   },
 

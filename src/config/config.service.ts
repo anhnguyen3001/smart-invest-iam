@@ -65,7 +65,6 @@ configService.ensureValues([
   'REFRESH_TOKEN_SECRET',
   'MAIL_ACCOUNT',
   'MAIL_PASS',
-  'MAIL_TOKEN_SECRET',
   'CLIENT_DOMAIN',
 ]);
 

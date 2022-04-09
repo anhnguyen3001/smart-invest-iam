@@ -46,10 +46,10 @@ export class InvalidTokenException extends APIException {
   }
 }
 
-export class EmailValidatedException extends APIException {
-  constructor(message = ApiCode[400].EMAIL_VALIDATED.description) {
+export class VerifiedUserException extends APIException {
+  constructor(message = ApiCode[400].VERIFIED_USER.description) {
     super(
-      ApiCode[400].EMAIL_VALIDATED.code,
+      ApiCode[400].VERIFIED_USER.code,
       HttpStatus.BAD_REQUEST,
       message,
       undefined,
