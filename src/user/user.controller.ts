@@ -42,7 +42,7 @@ export class UserController {
     );
   }
 
-  @Patch('update-info')
+  @Patch('me')
   @ApiOperation({
     summary: 'Update user info',
   })
