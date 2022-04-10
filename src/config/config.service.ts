@@ -66,6 +66,10 @@ configService.ensureValues([
   'MAIL_ACCOUNT',
   'MAIL_PASS',
   'API_VERSION',
+  'FB_APP_ID',
+  'FB_APP_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
 ]);
 
 export { configService };
