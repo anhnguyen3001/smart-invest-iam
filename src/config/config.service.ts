@@ -65,7 +65,7 @@ configService.ensureValues([
   'REFRESH_TOKEN_SECRET',
   'MAIL_ACCOUNT',
   'MAIL_PASS',
-  'CLIENT_DOMAIN',
+  'API_VERSION',
 ]);
 
 export { configService };
