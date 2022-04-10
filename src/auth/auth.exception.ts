@@ -3,67 +3,51 @@ import { ApiCode } from 'common/constants/apiCode';
 import { APIException } from 'common/exceptions';
 
 export class InvalidCredentialException extends APIException {
-  constructor(message = ApiCode[400].INVALID_CREDENTIALS.description) {
+  constructor() {
     super(
       ApiCode[400].INVALID_CREDENTIALS.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].INVALID_CREDENTIALS.description,
     );
   }
 }
 
 export class UnAuthorizedException extends APIException {
-  constructor(message = ApiCode[401].UNAUTHORIZED.description) {
+  constructor() {
     super(
       ApiCode[401].UNAUTHORIZED.code,
       HttpStatus.UNAUTHORIZED,
-      message,
-      undefined,
+      ApiCode[401].UNAUTHORIZED.description,
     );
   }
 }
 
 export class AccessDeniedException extends APIException {
-  constructor(message = ApiCode[403].ACCESS_DENIED.description) {
+  constructor() {
     super(
       ApiCode[403].ACCESS_DENIED.code,
       HttpStatus.FORBIDDEN,
-      message,
-      undefined,
+      ApiCode[403].ACCESS_DENIED.description,
     );
   }
 }
 
 export class InvalidTokenException extends APIException {
-  constructor(message = ApiCode[400].INVALID_TOKEN.description) {
+  constructor() {
     super(
       ApiCode[400].INVALID_TOKEN.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].INVALID_TOKEN.description,
     );
   }
 }
 
 export class VerifiedUserException extends APIException {
-  constructor(message = ApiCode[400].VERIFIED_USER.description) {
+  constructor() {
     super(
       ApiCode[400].VERIFIED_USER.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
-    );
-  }
-}
-
-export class UserNotFoundException extends APIException {
-  constructor(message = ApiCode[404].USER_NOT_FOUND.description) {
-    super(
-      ApiCode[404].USER_NOT_FOUND.code,
-      HttpStatus.NOT_FOUND,
-      message,
-      undefined,
+      ApiCode[400].VERIFIED_USER.description,
     );
   }
 }

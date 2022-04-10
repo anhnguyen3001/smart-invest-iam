@@ -9,10 +9,11 @@ import {
 import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
 import { GetUserId } from 'common/decorators/get-user-id.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
-import { getBaseResponse } from 'common/utils';
+import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
 import { User } from 'storage/entities/user.entity';
-import { ChangePasswordDto, UpdateUserDto } from './dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateInfoDto } from './dto/update-info.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -51,7 +52,7 @@ export class UserController {
   })
   async updateInfo(
     @GetUserId() id: number,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdateInfoDto,
   ): Promise<BaseResponse<User>> {
     const user = await this.userService.update(id, dto);
     return getBaseResponse({ data: user }, User);

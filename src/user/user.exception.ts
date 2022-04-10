@@ -3,45 +3,51 @@ import { ApiCode } from 'common/constants/apiCode';
 import { APIException } from 'common/exceptions';
 
 export class PasswordNotMatchException extends APIException {
-  constructor(message = ApiCode[400].PASSWORD_NOT_MATCH.description) {
+  constructor() {
     super(
       ApiCode[400].PASSWORD_NOT_MATCH.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].PASSWORD_NOT_MATCH.description,
     );
   }
 }
 
 export class OldPasswordWrongException extends APIException {
-  constructor(message = ApiCode[400].OLD_PASSWORD_INCORRECT.description) {
+  constructor() {
     super(
       ApiCode[400].OLD_PASSWORD_INCORRECT.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].OLD_PASSWORD_INCORRECT.description,
+    );
+  }
+}
+
+export class UserNotFoundException extends APIException {
+  constructor() {
+    super(
+      ApiCode[404].USER_NOT_FOUND.code,
+      HttpStatus.NOT_FOUND,
+      ApiCode[404].USER_NOT_FOUND.description,
     );
   }
 }
 
 export class UserExistedException extends APIException {
-  constructor(message = ApiCode[400].USER_EXISTED.description) {
+  constructor() {
     super(
       ApiCode[400].USER_EXISTED.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].USER_EXISTED.description,
     );
   }
 }
 
 export class LackPasswordException extends APIException {
-  constructor(message = ApiCode[400].LACK_PASSWORD.description) {
+  constructor() {
     super(
       ApiCode[400].LACK_PASSWORD.code,
       HttpStatus.BAD_REQUEST,
-      message,
-      undefined,
+      ApiCode[400].LACK_PASSWORD.description,
     );
   }
 }

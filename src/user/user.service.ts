@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { hashData } from 'common/utils';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
-import { FindConditions, Not, Repository } from 'typeorm';
-import { ChangePasswordDto, CreateUserDto } from './dto';
+import { FindConditions, Repository } from 'typeorm';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import {
   LackPasswordException,
   OldPasswordWrongException,
   UserExistedException,
+  UserNotFoundException,
 } from './user.exception';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class UserService {
     if (method === LoginMethodEnum.local) {
       if (!password) throw new LackPasswordException();
 
-      hashPassword = await hashData(password);
+      hashPassword = await this.hashPassword(password);
     }
 
     return this.userRepo.save(
@@ -43,11 +44,7 @@ export class UserService {
 
   async update(id: number, data: Partial<User>): Promise<User> {
     const user = await this.findOneById(id);
-
-    return this.userRepo.save({
-      ...user,
-      ...data,
-    });
+    return await this.updateUser(user, data);
   }
 
   async changePassword(id: number, data: ChangePasswordDto): Promise<User> {
@@ -61,7 +58,7 @@ export class UserService {
       throw new OldPasswordWrongException();
     }
 
-    const password = await hashData(newPassword);
+    const password = await this.hashPassword(newPassword);
 
     return this.userRepo.save({
       ...user,
@@ -69,12 +66,30 @@ export class UserService {
     });
   }
 
-  async findOneByLocalEmail(email: string): Promise<User> {
-    return this.userRepo.findOne({ email, method: LoginMethodEnum.local });
+  async findUnverifiedUserByEmail(
+    email: string,
+    isLocalLogin = false,
+  ): Promise<User> {
+    return this.userRepo.findOne({
+      email,
+      isVerified: false,
+      ...(isLocalLogin && {
+        method: LoginMethodEnum.local,
+      }),
+    });
   }
 
-  async findOneBySocialEmail(email: string): Promise<User> {
-    return this.userRepo.findOne({ email, method: Not(LoginMethodEnum.local) });
+  async findVerifiedUserByEmail(
+    email: string,
+    isLocalLogin = false,
+  ): Promise<User> {
+    return this.userRepo.findOne({
+      email,
+      isVerified: true,
+      ...(isLocalLogin && {
+        method: LoginMethodEnum.local,
+      }),
+    });
   }
 
   async findOneById(id: number): Promise<User> {
@@ -83,5 +98,22 @@ export class UserService {
 
   async findOne(condition: FindConditions<User>): Promise<User> {
     return this.userRepo.findOne({ where: condition });
+  }
+
+  async updateUser(user: User, data: Partial<User>): Promise<User> {
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const password = data.password
+      ? await this.hashPassword(data.password)
+      : undefined;
+
+    return this.userRepo.save({ ...user, ...(password && { password }) });
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(password, salt);
   }
 }

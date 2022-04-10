@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { hashData } from 'common/utils';
 import { OtpService } from 'otp/otp.service';
 import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { User } from 'storage/entities/user.entity';
 import { MailService } from '../external/mail/mail.service';
-import { UserExistedException } from '../user/user.exception';
+import {
+  UserExistedException,
+  UserNotFoundException,
+} from '../user/user.exception';
 import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
   InvalidCredentialException,
-  UserNotFoundException,
   VerifiedUserException,
 } from './auth.exception';
 import { JWT_SECRET_KEY } from './constants';
@@ -66,7 +67,7 @@ export class AuthService {
     const { confirmPassword, ...restDto } = dto;
     const user = await this.userService.create(restDto);
 
-    await this.sendVerifyUserMail(user);
+    this.sendVerifyUserMail(user);
 
     return user;
   }
@@ -74,7 +75,7 @@ export class AuthService {
   async verifyUser(query: VerifyUserQueryDto): Promise<void> {
     const { email, code } = query;
 
-    const user = await this.userService.findOneByLocalEmail(email);
+    const user = await this.userService.findUnverifiedUserByEmail(email, true);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -84,18 +85,18 @@ export class AuthService {
 
     await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.verifyUser);
 
-    this.userService.update(user.id, { isVerified: true });
+    await this.userService.updateUser(user, { isVerified: true });
   }
 
   async forgetPassword(data: ForgetPasswordDto): Promise<User> {
     const { email } = data;
 
-    const user = await this.userService.findOneByLocalEmail(email);
+    const user = await this.userService.findVerifiedUserByEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
 
-    await this.sendForgetPasswordMail(user);
+    this.sendForgetPasswordMail(user);
     return user;
   }
 
@@ -108,21 +109,20 @@ export class AuthService {
     const { email, token } = query;
     const { password } = data;
 
-    const user = await this.userService.findOneByLocalEmail(email);
+    const user = await this.userService.findVerifiedUserByEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
 
     await this.otpService.verifyOtp(user.id, token, OtpTypeEnum.forgetPassword);
 
-    const hashPassword = await hashData(password);
-    await this.userService.update(user.id, { password: hashPassword });
+    await this.userService.updateUser(user, { password });
   }
 
   async resendMail(data: ResendMailQueryDto): Promise<void> {
     const { type, email } = data;
 
-    const user = await this.userService.findOneByLocalEmail(email);
+    const user = await this.userService.findVerifiedUserByEmail(email);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -132,9 +132,9 @@ export class AuthService {
         throw new VerifiedUserException();
       }
 
-      await this.sendVerifyUserMail(user);
+      this.sendVerifyUserMail(user);
     } else {
-      await this.sendForgetPasswordMail(user);
+      this.sendForgetPasswordMail(user);
     }
   }
 
@@ -216,13 +216,13 @@ export class AuthService {
   }
 
   async validateUser(id: number, email: string): Promise<User> {
-    return this.userService.findOne({ id, email });
+    return this.userService.findOne({ id, email, isVerified: true });
   }
 
   async findOrCreateSocialUser(info: ILoginSocialInfo): Promise<User> {
     const { email, method } = info;
 
-    let user = await this.userService.findOne({ email });
+    let user = await this.userService.findVerifiedUserByEmail(email);
 
     if (!user) {
       // User login first time

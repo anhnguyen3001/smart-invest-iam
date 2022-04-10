@@ -12,7 +12,7 @@ export class APIException extends HttpException {
     code: string | number,
     status: HttpStatus,
     message: string,
-    details: any,
+    details?: any,
   ) {
     const exceptionResponse = {
       code,

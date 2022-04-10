@@ -20,7 +20,6 @@ import { GetUser } from 'common/decorators/get-user.decorator';
 import { Public } from 'common/decorators/public.decorator';
 import { BaseResponse, Identity } from 'common/types/api-response.type';
 import { RtGuard } from 'common/guards/rt.guard';
-import { getBaseResponse } from 'common/utils';
 import { User } from 'storage/entities/user.entity';
 import { AuthService } from './auth.service';
 import {
@@ -36,6 +35,7 @@ import {
 } from './dtos';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
 import { configService } from 'config/config.service';
+import { getBaseResponse } from 'common/utils/response';
 
 @ApiTags('Auth')
 @Controller({
