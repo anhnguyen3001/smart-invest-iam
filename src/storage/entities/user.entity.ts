@@ -53,6 +53,10 @@ export class User extends BaseEntity {
   refreshToken?: string;
 
   @Column({ enum: LoginMethodEnum, default: LoginMethodEnum.local })
+  @ApiProperty({
+    enum: LoginMethodEnum,
+  })
+  @Expose()
   method?: LoginMethodEnum;
 
   @OneToMany(() => Otp, (otp) => otp.user)
