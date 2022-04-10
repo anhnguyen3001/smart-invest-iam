@@ -22,7 +22,7 @@ import {
   ResetPasswordDto,
   ResetPasswordQuery,
   SignupDto,
-  Tokens,
+  TokenDto,
   VerifyUserQueryDto,
 } from './dtos';
 import { ILoginSocialInfo } from './interfaces';
@@ -36,7 +36,7 @@ export class AuthService {
     private readonly otpService: OtpService,
   ) {}
 
-  async login(dto: LoginDto): Promise<Tokens> {
+  async login(dto: LoginDto): Promise<TokenDto> {
     dto.validate();
 
     const { email, password } = dto;
@@ -54,7 +54,7 @@ export class AuthService {
     return this.getTokens(user);
   }
 
-  async loginSocial(user: User): Promise<Tokens> {
+  async loginSocial(user: User): Promise<TokenDto> {
     return this.getTokens(user);
   }
 
@@ -153,7 +153,7 @@ export class AuthService {
     await this.mailService.sendForgetPasswordMail(user.email, otp);
   }
 
-  async refreshToken(id: number, refreshToken: string): Promise<Tokens> {
+  async refreshToken(id: number, refreshToken: string): Promise<TokenDto> {
     const user = await this.userService.findOneById(id);
 
     const rtMatches = await bcrypt.compare(refreshToken, user.refreshToken);
@@ -164,7 +164,7 @@ export class AuthService {
     return await this.getTokens(user);
   }
 
-  async getTokens(user: User): Promise<Tokens> {
+  async getTokens(user: User): Promise<TokenDto> {
     const { id, email, refreshToken: oldRt } = user;
 
     let accessToken: string;

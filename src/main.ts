@@ -14,10 +14,12 @@ async function bootstrap() {
     .setTitle('AH Ticker Auth-BFF')
     .setDescription('AH Ticker Auth-BFF API')
     .setVersion('1.0.0')
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
-      'Authorization',
-    )
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      in: 'header',
+      name: 'Authorization',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

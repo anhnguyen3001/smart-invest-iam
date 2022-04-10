@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
@@ -9,14 +10,16 @@ import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator
 import { GetUserId } from 'common/decorators/get-user-id.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils';
+import { configService } from 'config/config.service';
 import { User } from 'storage/entities/user.entity';
 import { ChangePasswordDto, UpdateUserDto } from './dto';
 import { UserService } from './user.service';
 
+@ApiBearerAuth()
 @ApiTags('User')
 @Controller({
   path: 'user',
-  version: '1',
+  version: configService.getValue('API_VERSION'),
 })
 @ApiExtraModels(BaseResponse, User)
 export class UserController {

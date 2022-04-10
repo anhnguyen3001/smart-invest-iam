@@ -16,7 +16,6 @@ export class FacebookStrategy extends PassportStrategy(
     super({
       clientID: configService.getValue('FB_APP_ID'),
       clientSecret: configService.getValue('FB_APP_SECRET'),
-      callbackURL: configService.getValue('FB_APP_CALLBACK'),
       scope: 'email',
       profileFields: ['emails', 'displayName', 'photos'],
     });

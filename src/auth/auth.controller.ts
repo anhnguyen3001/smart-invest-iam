@@ -31,17 +31,18 @@ import {
   ResetPasswordDto,
   ResetPasswordQuery,
   SignupDto,
-  Tokens,
+  TokenDto,
   VerifyUserQueryDto,
 } from './dtos';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
+import { configService } from 'config/config.service';
 
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
-  version: '1',
+  version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, Tokens, Identity)
+@ApiExtraModels(BaseResponse, TokenDto, Identity)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -51,24 +52,23 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login',
   })
-  @ApiOkBaseResponse(Tokens, {
+  @ApiOkBaseResponse(TokenDto, {
     status: 200,
     description: 'Login successfully',
   })
-  async login(@Body() loginDto: LoginDto): Promise<BaseResponse<Tokens>> {
+  async login(@Body() loginDto: LoginDto): Promise<BaseResponse<TokenDto>> {
     const tokens = await this.authService.login(loginDto);
-
-    return getBaseResponse<Tokens>({ data: tokens }, Tokens);
+    return getBaseResponse<TokenDto>({ data: tokens }, TokenDto);
   }
 
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
   @ApiQuery({ type: LoginSocialDto })
-  @ApiOkBaseResponse(Tokens, {
+  @ApiOkBaseResponse(TokenDto, {
     description: 'Login facebook successfully',
   })
-  async loginFB(@GetUser() user: User): Promise<Tokens> {
+  async loginFB(@GetUser() user: User): Promise<TokenDto> {
     return this.authService.loginSocial(user);
   }
 
@@ -76,10 +76,10 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google')
   @ApiQuery({ type: LoginSocialDto })
-  @ApiOkBaseResponse(Tokens, {
+  @ApiOkBaseResponse(TokenDto, {
     description: 'Login google successfully',
   })
-  async loginGoogle(@GetUser() user: User): Promise<Tokens> {
+  async loginGoogle(@GetUser() user: User): Promise<TokenDto> {
     return this.authService.loginSocial(user);
   }
 
@@ -148,14 +148,14 @@ export class AuthController {
 
   @UseGuards(RtGuard)
   @Get('refresh-token')
-  @ApiOkBaseResponse(Tokens, {
+  @ApiOkBaseResponse(TokenDto, {
     description: 'Refresh token successfully',
   })
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<BaseResponse<Tokens>> {
+  ): Promise<BaseResponse<TokenDto>> {
     const tokens = await this.authService.refreshToken(id, refreshToken);
-    return getBaseResponse({ data: tokens }, Tokens);
+    return getBaseResponse({ data: tokens }, TokenDto);
   }
 }

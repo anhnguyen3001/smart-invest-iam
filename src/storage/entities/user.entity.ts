@@ -1,8 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Otp } from './otp.entity';
+import { Role } from './role.entity';
 
 export enum LoginMethodEnum {
   local = 'local',
@@ -50,4 +57,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Otp, (otp) => otp.user)
   otps: Otp[];
+
+  @ManyToMany(() => Role, (role) => role.users)
+  roles: Role[];
 }
