@@ -9,16 +9,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  ApiCreatedBaseResponse,
-  ApiOkBaseResponse,
-} from 'common/decorators/api-base-response.decorator';
+import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
 import { GetUser, GetUserId } from 'common/decorators/get-user.decorator';
 import { Public } from 'common/decorators/public.decorator';
 import { RtGuard } from 'common/guards/rt.guard';
@@ -94,12 +92,11 @@ export class AuthController {
   @ApiOperation({
     summary: 'Sign up',
   })
-  @ApiCreatedBaseResponse(Identity, {
+  @ApiCreatedResponse({
     description: 'Sign up successfully',
   })
-  async signup(@Body() dto: SignupDto): Promise<BaseResponse<Identity>> {
-    const user = await this.authService.signup(dto);
-    return getBaseResponse({ data: { id: user.id } }, Identity);
+  async signup(@Body() dto: SignupDto): Promise<void> {
+    await this.authService.signup(dto);
   }
 
   @Public()
