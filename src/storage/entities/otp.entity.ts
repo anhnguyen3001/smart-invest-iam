@@ -1,14 +1,14 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { CreatedEntity } from './base.entity';
+import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 
 export enum OtpTypeEnum {
   verifyUser = 'verifyUser',
-  forgetPassword = 'forgetPassword',
+  resetPassword = 'resetPassword',
 }
 
 @Entity('otps')
-export class Otp extends CreatedEntity {
+export class Otp extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -55,7 +55,7 @@ export class OtpService {
     userId: number,
     code: string,
     type: OtpTypeEnum,
-  ): Promise<void> {
+  ): Promise<Otp> {
     const otps = await this.otpRepo.find({
       relations: ['user'],
       where: { user: { id: userId }, type, expiredAt: MoreThan(new Date()) },
@@ -68,9 +68,9 @@ export class OtpService {
       throw new ExpiredOtpException();
     }
 
-    const otpSecret = otps[0].secret;
+    const { secret } = otps[0];
     const isValid = speakeasy.time.verify({
-      secret: otpSecret,
+      secret,
       token: code,
       encoding: this.encoding,
       step: 5 * 60,
@@ -78,5 +78,11 @@ export class OtpService {
     if (!isValid) {
       throw new InvalidCodeException();
     }
+
+    return otps[0];
+  }
+
+  async deleteOtp(id: number): Promise<void> {
+    await this.otpRepo.softDelete({ id });
   }
 }

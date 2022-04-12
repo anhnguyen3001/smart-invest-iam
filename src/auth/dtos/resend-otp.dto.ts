@@ -3,7 +3,7 @@ import { IsEnum, IsString, Matches } from 'class-validator';
 import { PATTERN_VALIDATION } from 'common/constants/validation';
 import { OtpTypeEnum } from 'storage/entities/otp.entity';
 
-export class ResendMailQueryDto {
+export class ResendOtpQueryDto {
   @ApiProperty({ type: OtpTypeEnum })
   @IsEnum(OtpTypeEnum)
   type: OtpTypeEnum;

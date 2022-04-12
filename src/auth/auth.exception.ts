@@ -51,3 +51,13 @@ export class VerifiedUserException extends APIException {
     );
   }
 }
+
+export class UnverifiedUserException extends APIException {
+  constructor() {
+    super(
+      ApiCode[400].UNVERIFIED_USER.code,
+      HttpStatus.BAD_REQUEST,
+      ApiCode[400].UNVERIFIED_USER.description,
+    );
+  }
+}

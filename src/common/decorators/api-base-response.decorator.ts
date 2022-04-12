@@ -1,5 +1,6 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiResponseOptions,
   getSchemaPath,
@@ -12,6 +13,25 @@ export const ApiOkBaseResponse = <TModel extends Type<any>>(
 ) => {
   return applyDecorators(
     ApiOkResponse({
+      ...responseOptions,
+      schema: {
+        $ref: getSchemaPath(BaseResponse),
+        properties: {
+          data: {
+            $ref: getSchemaPath(model),
+          },
+        },
+      },
+    }),
+  );
+};
+
+export const ApiCreatedBaseResponse = <TModel extends Type<any>>(
+  model: TModel,
+  responseOptions: ApiResponseOptions = {},
+) => {
+  return applyDecorators(
+    ApiCreatedResponse({
       ...responseOptions,
       schema: {
         $ref: getSchemaPath(BaseResponse),

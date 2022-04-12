@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Query,
   UseGuards,
@@ -14,28 +15,29 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { GetUserId } from 'common/decorators/get-user-id.decorator';
-import { GetUser } from 'common/decorators/get-user.decorator';
+import {
+  ApiCreatedBaseResponse,
+  ApiOkBaseResponse,
+} from 'common/decorators/api-base-response.decorator';
+import { GetUser, GetUserId } from 'common/decorators/get-user.decorator';
 import { Public } from 'common/decorators/public.decorator';
-import { BaseResponse, Identity } from 'common/types/api-response.type';
 import { RtGuard } from 'common/guards/rt.guard';
+import { BaseResponse, Identity } from 'common/types/api-response.type';
+import { getBaseResponse } from 'common/utils/response';
+import { configService } from 'config/config.service';
 import { User } from 'storage/entities/user.entity';
+import { UpdatePasswordDto } from 'user/dto/change-password.dto';
 import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
   LoginDto,
   LoginSocialDto,
-  ResendMailQueryDto,
-  ResetPasswordDto,
-  ResetPasswordQuery,
+  ResendOtpQueryDto,
   SignupDto,
   TokenDto,
-  VerifyUserQueryDto,
+  VerifyOtpQueryDto,
 } from './dtos';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
-import { configService } from 'config/config.service';
-import { getBaseResponse } from 'common/utils/response';
 
 @ApiTags('Auth')
 @Controller({
@@ -53,7 +55,6 @@ export class AuthController {
     summary: 'Login',
   })
   @ApiOkBaseResponse(TokenDto, {
-    status: 200,
     description: 'Login successfully',
   })
   async login(@Body() loginDto: LoginDto): Promise<BaseResponse<TokenDto>> {
@@ -93,10 +94,9 @@ export class AuthController {
   @ApiOperation({
     summary: 'Sign up',
   })
-  @ApiOkBaseResponse(Identity, {
+  @ApiCreatedBaseResponse(Identity, {
     description: 'Sign up successfully',
   })
-  @ApiOkResponse({ description: 'Sign up successfully' })
   async signup(@Body() dto: SignupDto): Promise<BaseResponse<Identity>> {
     const user = await this.authService.signup(dto);
     return getBaseResponse({ data: { id: user.id } }, Identity);
@@ -107,43 +107,53 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify account',
   })
-  async verifyUser(@Query() query: VerifyUserQueryDto): Promise<void> {
+  async verifyUser(@Query() query: VerifyOtpQueryDto): Promise<void> {
     await this.authService.verifyUser(query);
   }
 
   @Public()
-  @Post('forget-password')
+  @Get('recover/init')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Forget password',
   })
-  @ApiOkBaseResponse(Identity, { description: 'Forget password successfully' })
-  async forgetPassword(
-    @Body() dto: ForgetPasswordDto,
-  ): Promise<BaseResponse<Identity>> {
-    const user = await this.authService.forgetPassword(dto);
-    return getBaseResponse({ data: { id: user.id } }, Identity);
+  @ApiOkResponse({
+    description: 'Forget password successfully',
+  })
+  async forgetPassword(@Query() query: ForgetPasswordDto): Promise<void> {
+    await this.authService.forgetPassword(query);
   }
 
   @Public()
-  @Post('reset-password')
+  @Get('recover/code')
+  @ApiOperation({
+    summary: 'Verify otp for reset password',
+  })
+  async recoverCode(@Query() query: VerifyOtpQueryDto): Promise<void> {
+    await this.authService.verifyOtpResetPassword(query);
+  }
+
+  @Public()
+  @Post('recover/password')
   @ApiOperation({
     summary: 'Reset password',
   })
   @ApiOkResponse({ description: 'Reset password successfully' })
-  async resetPassword(
-    @Query() query: ResetPasswordQuery,
-    @Body() dto: ResetPasswordDto,
+  async recoverPassword(
+    @Query() query: VerifyOtpQueryDto,
+    @Body() dto: UpdatePasswordDto,
   ): Promise<void> {
-    await this.authService.resetPassword(query, dto);
+    await this.authService.recoverPassword(query, dto);
   }
 
   @Public()
-  @Get('resend-mail')
+  @Get('resend')
   @ApiOperation({
-    summary: 'Resend email',
+    summary: 'Resend OTP',
   })
-  async resendMail(@Query() query: ResendMailQueryDto): Promise<void> {
-    await this.authService.resendMail(query);
+  @ApiOkResponse({ description: 'Resend otp success' })
+  async resendOtp(@Query() query: ResendOtpQueryDto): Promise<void> {
+    await this.authService.resendOtp(query);
   }
 
   @UseGuards(RtGuard)

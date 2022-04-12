@@ -2,12 +2,13 @@ import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiExtraModels,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { GetUserId } from 'common/decorators/get-user-id.decorator';
+import { GetUserId } from 'common/decorators/get-user.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
@@ -47,15 +48,14 @@ export class UserController {
   @ApiOperation({
     summary: 'Update user info',
   })
-  @ApiOkBaseResponse(User, {
+  @ApiNoContentResponse({
     description: 'Update user info successfully',
   })
   async updateInfo(
     @GetUserId() id: number,
     @Body() dto: UpdateInfoDto,
-  ): Promise<BaseResponse<User>> {
-    const user = await this.userService.update(id, dto);
-    return getBaseResponse({ data: user }, User);
+  ): Promise<void> {
+    await this.userService.updateProfile(id, dto);
   }
 
   @Post('change-password')

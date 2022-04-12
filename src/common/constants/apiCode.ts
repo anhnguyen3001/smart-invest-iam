@@ -79,6 +79,10 @@ export const ApiCode = {
       code: '1007',
       description: 'Invalid OTP',
     },
+    UNVERIFIED_USER: {
+      code: '1006',
+      description: 'Your email had not been verified',
+    },
   },
 
   [HttpStatus.UNAUTHORIZED]: {

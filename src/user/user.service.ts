@@ -19,9 +19,7 @@ export class UserService {
   async create(data: CreateUserDto): Promise<User> {
     const { password, method = LoginMethodEnum.local, ...rest } = data;
 
-    const existedUser = await this.userRepo.findOne({
-      where: [{ email: data.email }],
-    });
+    const existedUser = await this.findVerifiedUserByEmail(data.email);
     if (existedUser) {
       throw new UserExistedException();
     }
@@ -42,9 +40,12 @@ export class UserService {
     );
   }
 
-  async update(id: number, data: Partial<User>): Promise<User> {
+  async updateProfile(id: number, data: Partial<User>): Promise<void> {
     const user = await this.findOneById(id);
-    return await this.updateUser(user, data);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+    await this.updateUserById(user.id, data);
   }
 
   async changePassword(id: number, data: ChangePasswordDto): Promise<User> {
@@ -100,16 +101,18 @@ export class UserService {
     return this.userRepo.findOne({ where: condition });
   }
 
-  async updateUser(user: User, data: Partial<User>): Promise<User> {
-    if (!user) {
-      throw new UserNotFoundException();
-    }
-
+  async updateUserById(id: number, data: Partial<User>): Promise<void> {
     const password = data.password
       ? await this.hashPassword(data.password)
       : undefined;
 
-    return this.userRepo.save({ ...user, ...(password && { password }) });
+    await this.userRepo.update(
+      { id },
+      {
+        ...data,
+        ...(password && { password }),
+      },
+    );
   }
 
   async hashPassword(password: string): Promise<string> {
