@@ -20,11 +20,11 @@ import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator
 import { GetUser, GetUserId } from 'common/decorators/get-user.decorator';
 import { Public } from 'common/decorators/public.decorator';
 import { RtGuard } from 'common/guards/rt.guard';
-import { BaseResponse, Identity } from 'common/types/api-response.type';
+import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
 import { User } from 'storage/entities/user.entity';
-import { UpdatePasswordDto } from 'user/dto/change-password.dto';
+import { UpdatePasswordDto } from 'user/user.dto';
 import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
@@ -32,9 +32,9 @@ import {
   LoginSocialDto,
   ResendOtpQueryDto,
   SignupDto,
-  TokenDto,
+  TokenResultDto,
   VerifyOtpQueryDto,
-} from './dtos';
+} from './auth.dto';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
 
 @ApiTags('Auth')
@@ -42,7 +42,7 @@ import { FBAuthGuard, GoogleAuthGuard } from './guards';
   path: 'auth',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, TokenDto, Identity)
+@ApiExtraModels(BaseResponse, TokenResultDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -52,22 +52,27 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login',
   })
-  @ApiOkBaseResponse(TokenDto, {
+  @ApiOkBaseResponse(TokenResultDto, {
     description: 'Login successfully',
   })
-  async login(@Body() loginDto: LoginDto): Promise<BaseResponse<TokenDto>> {
+  async login(
+    @Body() loginDto: LoginDto,
+  ): Promise<BaseResponse<TokenResultDto>> {
     const tokens = await this.authService.login(loginDto);
-    return getBaseResponse<TokenDto>({ data: tokens }, TokenDto);
+    return getBaseResponse<TokenResultDto>({ data: tokens }, TokenResultDto);
   }
 
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
   @ApiQuery({ type: LoginSocialDto })
-  @ApiOkBaseResponse(TokenDto, {
+  @ApiOperation({
+    summary: 'Login Facebook',
+  })
+  @ApiOkBaseResponse(TokenResultDto, {
     description: 'Login facebook successfully',
   })
-  async loginFB(@GetUser() user: User): Promise<TokenDto> {
+  async loginFB(@GetUser() user: User): Promise<TokenResultDto> {
     return this.authService.loginSocial(user);
   }
 
@@ -75,10 +80,13 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google')
   @ApiQuery({ type: LoginSocialDto })
-  @ApiOkBaseResponse(TokenDto, {
+  @ApiOperation({
+    summary: 'Login Google',
+  })
+  @ApiOkBaseResponse(TokenResultDto, {
     description: 'Login google successfully',
   })
-  async loginGoogle(@GetUser() user: User): Promise<TokenDto> {
+  async loginGoogle(@GetUser() user: User): Promise<TokenResultDto> {
     return this.authService.loginSocial(user);
   }
 
@@ -104,6 +112,9 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify account',
   })
+  @ApiOkResponse({
+    description: 'Verify account successfully',
+  })
   async verifyUser(@Query() query: VerifyOtpQueryDto): Promise<void> {
     await this.authService.verifyUser(query);
   }
@@ -125,6 +136,9 @@ export class AuthController {
   @Get('recover/code')
   @ApiOperation({
     summary: 'Verify otp for reset password',
+  })
+  @ApiOkResponse({
+    description: 'Verify OTP successfully',
   })
   async recoverCode(@Query() query: VerifyOtpQueryDto): Promise<void> {
     await this.authService.verifyOtpResetPassword(query);
@@ -155,14 +169,14 @@ export class AuthController {
 
   @UseGuards(RtGuard)
   @Get('refresh-token')
-  @ApiOkBaseResponse(TokenDto, {
+  @ApiOkBaseResponse(TokenResultDto, {
     description: 'Refresh token successfully',
   })
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<BaseResponse<TokenDto>> {
+  ): Promise<BaseResponse<TokenResultDto>> {
     const tokens = await this.authService.refreshToken(id, refreshToken);
-    return getBaseResponse({ data: tokens }, TokenDto);
+    return getBaseResponse({ data: tokens }, TokenResultDto);
   }
 }

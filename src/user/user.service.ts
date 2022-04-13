@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import { FindConditions, Repository } from 'typeorm';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { ICreateUser, ChangePasswordDto } from './user.dto';
 import {
   LackPasswordException,
   OldPasswordWrongException,
@@ -16,8 +15,13 @@ import {
 export class UserService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  async create(data: CreateUserDto): Promise<User> {
-    const { password, method = LoginMethodEnum.local, ...rest } = data;
+  async create(data: ICreateUser): Promise<User> {
+    const {
+      password,
+      method = LoginMethodEnum.local,
+      isVerified = false,
+      ...rest
+    } = data;
 
     const existedUser = await this.findVerifiedUserByEmail(data.email);
     if (existedUser) {
@@ -35,6 +39,7 @@ export class UserService {
       this.userRepo.create({
         password: hashPassword,
         method,
+        isVerified,
         ...rest,
       }),
     );
@@ -48,10 +53,13 @@ export class UserService {
     await this.updateUserById(user.id, data);
   }
 
-  async changePassword(id: number, data: ChangePasswordDto): Promise<User> {
+  async changePassword(id: number, data: ChangePasswordDto): Promise<void> {
     data.validate();
 
     const user = await this.findOneById(id);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
 
     const { oldPassword, newPassword } = data;
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);
@@ -59,12 +67,7 @@ export class UserService {
       throw new OldPasswordWrongException();
     }
 
-    const password = await this.hashPassword(newPassword);
-
-    return this.userRepo.save({
-      ...user,
-      password,
-    });
+    await this.updateUserById(id, { password: newPassword });
   }
 
   async findUnverifiedUserByEmail(
@@ -94,7 +97,7 @@ export class UserService {
   }
 
   async findOneById(id: number): Promise<User> {
-    return this.userRepo.findOne({ id });
+    return this.userRepo.findOne({ id, isVerified: true });
   }
 
   async findOne(condition: FindConditions<User>): Promise<User> {

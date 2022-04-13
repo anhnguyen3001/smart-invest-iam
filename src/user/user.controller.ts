@@ -1,9 +1,16 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -12,9 +19,7 @@ import { GetUserId } from 'common/decorators/get-user.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
-import { User } from 'storage/entities/user.entity';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { UpdateInfoDto } from './dto/update-info.dto';
+import { ChangePasswordDto, UpdateProfileDto, UserResultDto } from './user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -23,7 +28,7 @@ import { UserService } from './user.service';
   path: 'user',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, User)
+@ApiExtraModels(BaseResponse, UserResultDto)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -31,38 +36,41 @@ export class UserController {
   @ApiOperation({
     summary: 'Get user info',
   })
-  @ApiOkBaseResponse(User, {
+  @ApiOkBaseResponse(UserResultDto, {
     description: 'Get user info successfully',
   })
-  async getUserInfo(@GetUserId() id: number): Promise<BaseResponse<User>> {
+  async getUserInfo(
+    @GetUserId() id: number,
+  ): Promise<BaseResponse<UserResultDto>> {
     const user = await this.userService.findOneById(id);
     return getBaseResponse(
       {
-        data: user,
+        data: { user },
       },
-      User,
+      UserResultDto,
     );
   }
 
   @Patch('me')
   @ApiOperation({
-    summary: 'Update user info',
+    summary: 'Update user profile',
   })
   @ApiNoContentResponse({
-    description: 'Update user info successfully',
+    description: 'Update user profile successfully',
   })
-  async updateInfo(
+  async updateProfile(
     @GetUserId() id: number,
-    @Body() dto: UpdateInfoDto,
+    @Body() dto: UpdateProfileDto,
   ): Promise<void> {
     await this.userService.updateProfile(id, dto);
   }
 
   @Post('change-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Change password',
   })
-  @ApiOkResponse({ description: 'Change password successfully' })
+  @ApiNoContentResponse({ description: 'Change password successfully' })
   async changePassword(
     @GetUserId() id: number,
     @Body() dto: ChangePasswordDto,

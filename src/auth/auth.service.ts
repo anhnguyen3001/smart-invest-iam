@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { OtpService } from 'otp/otp.service';
 import { Otp, OtpTypeEnum } from 'storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
-import { UpdatePasswordDto } from 'user/dto/change-password.dto';
+import { UpdatePasswordDto } from 'user/user.dto';
 import { MailService } from '../external/mail/mail.service';
 import {
   UserExistedException,
@@ -23,10 +23,9 @@ import {
   LoginDto,
   ResendOtpQueryDto,
   SignupDto,
-  TokenDto,
+  TokenResultDto,
   VerifyOtpQueryDto,
-  VerifyUserQueryDto,
-} from './dtos';
+} from './auth.dto';
 import { ILoginSocialInfo } from './interfaces';
 
 @Injectable()
@@ -38,7 +37,7 @@ export class AuthService {
     private readonly otpService: OtpService,
   ) {}
 
-  async login(dto: LoginDto): Promise<TokenDto> {
+  async login(dto: LoginDto): Promise<TokenResultDto> {
     dto.validate();
 
     const { email, password } = dto;
@@ -56,7 +55,7 @@ export class AuthService {
     return this.getTokens(user);
   }
 
-  async loginSocial(user: User): Promise<TokenDto> {
+  async loginSocial(user: User): Promise<TokenResultDto> {
     return this.getTokens(user);
   }
 
@@ -73,7 +72,7 @@ export class AuthService {
     return user;
   }
 
-  async verifyUser(query: VerifyUserQueryDto): Promise<void> {
+  async verifyUser(query: VerifyOtpQueryDto): Promise<void> {
     const { email, code } = query;
 
     const user = await this.userService.findUnverifiedUserByEmail(email, true);
@@ -182,7 +181,10 @@ export class AuthService {
     await this.mailService.sendForgetPasswordMail(user.email, otp);
   }
 
-  async refreshToken(id: number, refreshToken: string): Promise<TokenDto> {
+  async refreshToken(
+    id: number,
+    refreshToken: string,
+  ): Promise<TokenResultDto> {
     const user = await this.userService.findOneById(id);
 
     const rtMatches = await bcrypt.compare(refreshToken, user.refreshToken);
@@ -193,7 +195,7 @@ export class AuthService {
     return await this.getTokens(user);
   }
 
-  async getTokens(user: User): Promise<TokenDto> {
+  async getTokens(user: User): Promise<TokenResultDto> {
     const { id, email, refreshToken: oldRt } = user;
 
     let accessToken: string;
