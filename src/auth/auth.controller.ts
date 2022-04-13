@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -32,17 +33,19 @@ import {
   LoginSocialDto,
   ResendOtpQueryDto,
   SignupDto,
-  TokenResultDto,
+  TokenResult,
   VerifyOtpQueryDto,
+  OtpTokenResult,
 } from './auth.dto';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
+import { Request } from 'express';
 
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, TokenResultDto)
+@ApiExtraModels(BaseResponse, OtpTokenResult, TokenResult)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -52,14 +55,12 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login',
   })
-  @ApiOkBaseResponse(TokenResultDto, {
+  @ApiOkBaseResponse(TokenResult, {
     description: 'Login successfully',
   })
-  async login(
-    @Body() loginDto: LoginDto,
-  ): Promise<BaseResponse<TokenResultDto>> {
+  async login(@Body() loginDto: LoginDto): Promise<BaseResponse<TokenResult>> {
     const tokens = await this.authService.login(loginDto);
-    return getBaseResponse<TokenResultDto>({ data: tokens }, TokenResultDto);
+    return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
   @Public()
@@ -69,10 +70,10 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login Facebook',
   })
-  @ApiOkBaseResponse(TokenResultDto, {
+  @ApiOkBaseResponse(TokenResult, {
     description: 'Login facebook successfully',
   })
-  async loginFB(@GetUser() user: User): Promise<TokenResultDto> {
+  async loginFB(@GetUser() user: User): Promise<TokenResult> {
     return this.authService.loginSocial(user);
   }
 
@@ -83,10 +84,10 @@ export class AuthController {
   @ApiOperation({
     summary: 'Login Google',
   })
-  @ApiOkBaseResponse(TokenResultDto, {
+  @ApiOkBaseResponse(TokenResult, {
     description: 'Login google successfully',
   })
-  async loginGoogle(@GetUser() user: User): Promise<TokenResultDto> {
+  async loginGoogle(@GetUser() user: User): Promise<TokenResult> {
     return this.authService.loginSocial(user);
   }
 
@@ -121,7 +122,6 @@ export class AuthController {
 
   @Public()
   @Get('recover/init')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Forget password',
   })
@@ -137,24 +137,29 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify otp for reset password',
   })
-  @ApiOkResponse({
+  @ApiOkBaseResponse(OtpTokenResult, {
     description: 'Verify OTP successfully',
   })
-  async recoverCode(@Query() query: VerifyOtpQueryDto): Promise<void> {
-    await this.authService.verifyOtpResetPassword(query);
+  async recoverCode(
+    @Query() query: VerifyOtpQueryDto,
+  ): Promise<BaseResponse<OtpTokenResult>> {
+    const token = await this.authService.verifyOtpResetPassword(query);
+    return getBaseResponse({ data: { token } }, OtpTokenResult);
   }
 
   @Public()
   @Post('recover/password')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Reset password',
   })
   @ApiOkResponse({ description: 'Reset password successfully' })
   async recoverPassword(
-    @Query() query: VerifyOtpQueryDto,
+    @Req() req: Request,
     @Body() dto: UpdatePasswordDto,
   ): Promise<void> {
-    await this.authService.recoverPassword(query, dto);
+    const token = req.headers.authorization;
+    await this.authService.recoverPassword(dto, token);
   }
 
   @Public()
@@ -169,14 +174,14 @@ export class AuthController {
 
   @UseGuards(RtGuard)
   @Get('refresh-token')
-  @ApiOkBaseResponse(TokenResultDto, {
+  @ApiOkBaseResponse(TokenResult, {
     description: 'Refresh token successfully',
   })
   async refreshToken(
     @GetUserId() id: number,
     @GetUser('refreshToken') refreshToken: string,
-  ): Promise<BaseResponse<TokenResultDto>> {
+  ): Promise<BaseResponse<TokenResult>> {
     const tokens = await this.authService.refreshToken(id, refreshToken);
-    return getBaseResponse({ data: tokens }, TokenResultDto);
+    return getBaseResponse({ data: tokens }, TokenResult);
   }
 }

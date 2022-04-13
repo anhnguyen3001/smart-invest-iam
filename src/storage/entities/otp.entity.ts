@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { BaseEntity } from './base.entity';
+import { CreateDeleteEntity } from './base.entity';
 import { User } from './user.entity';
 
 export enum OtpTypeEnum {
@@ -8,7 +8,7 @@ export enum OtpTypeEnum {
 }
 
 @Entity('otps')
-export class Otp extends BaseEntity {
+export class Otp extends CreateDeleteEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

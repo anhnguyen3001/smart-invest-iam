@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsString,
@@ -36,7 +36,7 @@ export class LoginSocialDto {
   access_token: string;
 }
 
-export class TokenResultDto {
+export class TokenResult {
   @ApiProperty({ type: 'string' })
   @Expose()
   accessToken: string;
@@ -91,6 +91,12 @@ export class VerifyOtpQueryDto {
   @ApiProperty({ type: 'string' })
   @IsString()
   code: string;
+}
+
+export class OtpTokenResult {
+  @Expose()
+  @ApiResponseProperty({ type: 'string' })
+  token: string;
 }
 
 export class ResendOtpQueryDto {

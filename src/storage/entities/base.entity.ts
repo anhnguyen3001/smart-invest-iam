@@ -1,6 +1,6 @@
 import { CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
-export class BaseEntity {
+export class CreateDeleteEntity {
   @CreateDateColumn({
     type: 'timestamp',
     precision: 6,
@@ -8,6 +8,15 @@ export class BaseEntity {
   })
   createdAt: string;
 
+  @DeleteDateColumn({
+    type: 'timestamp',
+    precision: 6,
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  deletedAt: string;
+}
+
+export class BaseEntity extends CreateDeleteEntity {
   @UpdateDateColumn({
     type: 'timestamp',
     precision: 6,
@@ -15,11 +24,4 @@ export class BaseEntity {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt: string;
-
-  @DeleteDateColumn({
-    type: 'timestamp',
-    precision: 6,
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  deletedAt: string;
 }

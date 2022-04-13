@@ -14,6 +14,7 @@ import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
   InvalidCredentialException,
+  InvalidTokenException,
   UnverifiedUserException,
   VerifiedUserException,
 } from './auth.exception';
@@ -23,10 +24,10 @@ import {
   LoginDto,
   ResendOtpQueryDto,
   SignupDto,
-  TokenResultDto,
+  TokenResult,
   VerifyOtpQueryDto,
 } from './auth.dto';
-import { ILoginSocialInfo } from './interfaces';
+import { IJWTPayload, ILoginSocialInfo } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,7 @@ export class AuthService {
     private readonly otpService: OtpService,
   ) {}
 
-  async login(dto: LoginDto): Promise<TokenResultDto> {
+  async login(dto: LoginDto): Promise<TokenResult> {
     dto.validate();
 
     const { email, password } = dto;
@@ -55,7 +56,7 @@ export class AuthService {
     return this.getTokens(user);
   }
 
-  async loginSocial(user: User): Promise<TokenResultDto> {
+  async loginSocial(user: User): Promise<TokenResult> {
     return this.getTokens(user);
   }
 
@@ -106,7 +107,7 @@ export class AuthService {
     this.sendForgetPasswordMail(user);
   }
 
-  async verifyOtpResetPassword(query: VerifyOtpQueryDto): Promise<Otp> {
+  async verifyOtpResetPassword(query: VerifyOtpQueryDto): Promise<string> {
     const { email, code } = query;
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
@@ -114,33 +115,36 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    return this.otpService.verifyOtp(user.id, code, OtpTypeEnum.resetPassword);
+    await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.resetPassword);
+
+    return this.jwtService.sign(
+      {
+        sub: user.id,
+        email,
+      },
+      {
+        expiresIn: '10m',
+        secret: JWT_SECRET_KEY.resetPass,
+      },
+    );
   }
 
-  async recoverPassword(
-    query: VerifyOtpQueryDto,
-    data: UpdatePasswordDto,
-  ): Promise<void> {
+  async recoverPassword(data: UpdatePasswordDto, token: string): Promise<void> {
     data.validate();
 
-    const { email, code } = query;
     const { newPassword: password } = data;
+    let id;
 
-    const user = await this.userService.findVerifiedUserByEmail(email);
-    if (!user) {
-      throw new UserNotFoundException();
+    try {
+      const jwtPayload: IJWTPayload = await this.jwtService.verify(token, {
+        secret: JWT_SECRET_KEY.resetPass,
+      });
+      id = jwtPayload.sub;
+    } catch (e) {
+      throw new InvalidTokenException();
     }
 
-    const { id: otpId } = await this.otpService.verifyOtp(
-      user.id,
-      code,
-      OtpTypeEnum.resetPassword,
-    );
-
-    await Promise.all([
-      this.otpService.deleteOtp(otpId),
-      this.userService.updateUserById(user.id, { password }),
-    ]);
+    await this.userService.updateUserById(id, { password });
   }
 
   async resendOtp(data: ResendOtpQueryDto): Promise<void> {
@@ -181,10 +185,7 @@ export class AuthService {
     await this.mailService.sendForgetPasswordMail(user.email, otp);
   }
 
-  async refreshToken(
-    id: number,
-    refreshToken: string,
-  ): Promise<TokenResultDto> {
+  async refreshToken(id: number, refreshToken: string): Promise<TokenResult> {
     const user = await this.userService.findOneById(id);
 
     const rtMatches = await bcrypt.compare(refreshToken, user.refreshToken);
@@ -195,7 +196,7 @@ export class AuthService {
     return await this.getTokens(user);
   }
 
-  async getTokens(user: User): Promise<TokenResultDto> {
+  async getTokens(user: User): Promise<TokenResult> {
     const { id, email, refreshToken: oldRt } = user;
 
     let accessToken: string;
