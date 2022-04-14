@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -17,15 +17,6 @@ export interface ICreateUser {
   isVerified?: boolean;
   password?: string;
   method?: LoginMethodEnum;
-}
-
-export class ValidateUserQueryDto {
-  @IsString()
-  @Matches(PATTERN_VALIDATION.email)
-  email: string;
-
-  @IsString()
-  token: string;
 }
 
 export class UpdatePasswordDto {
@@ -67,7 +58,8 @@ export class UpdateProfileDto {
 }
 
 export class UserResultDto {
-  @ApiProperty({ type: User })
+  @Expose()
+  @ApiResponseProperty({ type: User })
   @Type(() => User)
   user: User;
 }

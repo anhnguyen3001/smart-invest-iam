@@ -99,7 +99,7 @@ export class AuthService {
   async forgetPassword(data: ForgetPasswordDto): Promise<void> {
     const { email } = data;
 
-    const user = await this.userService.findVerifiedUserByEmail(email);
+    const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
       throw new UserNotFoundException();
     }
