@@ -8,7 +8,6 @@ import {
   LackPasswordException,
   OldPasswordWrongException,
   UserExistedException,
-  UserNotFoundException,
 } from './user.exception';
 
 @Injectable()
@@ -47,9 +46,6 @@ export class UserService {
 
   async updateProfile(id: number, data: Partial<User>): Promise<void> {
     const user = await this.findOneById(id);
-    if (!user) {
-      throw new UserNotFoundException();
-    }
     await this.updateUserById(user.id, data);
   }
 
@@ -57,9 +53,6 @@ export class UserService {
     data.validate();
 
     const user = await this.findOneById(id);
-    if (!user) {
-      throw new UserNotFoundException();
-    }
 
     const { oldPassword, newPassword } = data;
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);

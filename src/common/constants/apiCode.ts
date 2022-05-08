@@ -100,9 +100,9 @@ export const ApiCode = {
   },
 
   [HttpStatus.NOT_FOUND]: {
-    USER_NOT_FOUND: {
+    NOT_FOUND: {
       code: '000',
-      description: 'Not found user',
+      description: 'not found',
     },
   },
 
@@ -133,3 +133,7 @@ Object.entries(ApiCode).forEach(([k, v]) => {
     ApiCode[k][c]['code'] = `${k}${oldCode}`;
   });
 });
+
+export enum NotFoundEnum {
+  user = 'User',
+}

@@ -22,16 +22,6 @@ export class OldPasswordWrongException extends APIException {
   }
 }
 
-export class UserNotFoundException extends APIException {
-  constructor() {
-    super(
-      ApiCode[404].USER_NOT_FOUND.code,
-      HttpStatus.NOT_FOUND,
-      ApiCode[404].USER_NOT_FOUND.description,
-    );
-  }
-}
-
 export class UserExistedException extends APIException {
   constructor() {
     super(

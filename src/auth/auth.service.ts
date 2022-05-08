@@ -2,14 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { OtpService } from 'otp/otp.service';
-import { Otp, OtpTypeEnum } from 'storage/entities/otp.entity';
+import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import { UpdatePasswordDto } from 'user/user.dto';
 import { MailService } from '../external/mail/mail.service';
-import {
-  UserExistedException,
-  UserNotFoundException,
-} from '../user/user.exception';
+import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
@@ -28,6 +25,8 @@ import {
   VerifyOtpQueryDto,
 } from './auth.dto';
 import { IJWTPayload, ILoginSocialInfo } from './interfaces';
+import { NotFoundException } from 'common/exceptions';
+import { NotFoundEnum } from 'common/constants/apiCode';
 
 @Injectable()
 export class AuthService {
@@ -78,7 +77,7 @@ export class AuthService {
 
     const user = await this.userService.findUnverifiedUserByEmail(email, true);
     if (!user) {
-      throw new UserNotFoundException();
+      throw new NotFoundException(NotFoundEnum.user);
     }
     if (user.isVerified) {
       throw new VerifiedUserException();
@@ -101,7 +100,7 @@ export class AuthService {
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
-      throw new UserNotFoundException();
+      throw new NotFoundException(NotFoundEnum.user);
     }
 
     this.sendForgetPasswordMail(user);
@@ -112,7 +111,7 @@ export class AuthService {
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
-      throw new UserNotFoundException();
+      throw new NotFoundException(NotFoundEnum.user);
     }
 
     await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.resetPassword);
@@ -155,7 +154,7 @@ export class AuthService {
       method: LoginMethodEnum.local,
     });
     if (!user) {
-      throw new UserNotFoundException();
+      throw new NotFoundException(NotFoundEnum.user);
     }
 
     if (type === OtpTypeEnum.verifyUser) {

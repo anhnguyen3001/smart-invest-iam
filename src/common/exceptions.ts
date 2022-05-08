@@ -66,7 +66,16 @@ export class MissingFieldHeaderException extends APIException {
       ApiCode[400].MISSING_FIELD_HEADER.code,
       HttpStatus.BAD_REQUEST,
       message,
-      undefined,
+    );
+  }
+}
+
+export class NotFoundException extends APIException {
+  constructor(field: string) {
+    super(
+      ApiCode[404].NOT_FOUND.code,
+      HttpStatus.NOT_FOUND,
+      `${field} ${ApiCode[404].NOT_FOUND.code}`,
     );
   }
 }
@@ -97,7 +106,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
             exception.getStatus(),
             (exception.getResponse() as any)?.message ||
               ApiCode[500].UNHANDLED_ERROR.description,
-            undefined,
           ).toObj(),
         );
     }
