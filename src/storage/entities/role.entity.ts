@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
@@ -36,19 +37,8 @@ export class Role extends BaseEntity {
   })
   permissions: Permission[];
 
-  @ManyToMany(() => User, (user) => user.roles, {
+  @OneToMany(() => User, (user) => user.role, {
     cascade: true,
-  })
-  @JoinTable({
-    name: 'user_role',
-    joinColumn: {
-      name: 'role_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
   })
   users: User[];
 }

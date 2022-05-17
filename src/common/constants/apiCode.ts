@@ -136,4 +136,5 @@ Object.entries(ApiCode).forEach(([k, v]) => {
 
 export enum NotFoundEnum {
   user = 'User',
+  role = 'Role',
 }

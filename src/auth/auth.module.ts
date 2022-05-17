@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { MailModule } from 'external/mail';
 import { OtpModule } from 'otp/otp.module';
+import { RoleModule } from 'role/role.module';
 import { UserModule } from 'user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -15,6 +16,7 @@ import { FacebookStrategy, GoogleStrategy, JwtStrategy } from './strategies';
     UserModule,
     MailModule,
     OtpModule,
+    RoleModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy],

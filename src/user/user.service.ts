@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { NotFoundEnum } from 'common/constants/apiCode';
+import { NotFoundException } from 'common/exceptions';
+import { configService } from 'config/config.service';
+import { RoleService } from 'role/role.service';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import { FindConditions, Repository } from 'typeorm';
 import { ICreateUser, ChangePasswordDto } from './user.dto';
@@ -12,7 +16,10 @@ import {
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private readonly roleService: RoleService,
+  ) {}
 
   async create(data: ICreateUser): Promise<User> {
     const {
@@ -34,7 +41,7 @@ export class UserService {
       hashPassword = await this.hashPassword(password);
     }
 
-    return this.userRepo.save(
+    const user = await this.userRepo.save(
       this.userRepo.create({
         password: hashPassword,
         method,
@@ -42,11 +49,32 @@ export class UserService {
         ...rest,
       }),
     );
+
+    const role = await this.roleService.findOneByCode(
+      configService.getValue('USER_ROLE_CODE'),
+    );
+    if (!role) {
+      throw new NotFoundException(NotFoundEnum.role);
+    }
+
+    await this.userRepo.update(
+      { id: user.id },
+      {
+        ...user,
+        role,
+      },
+    );
+
+    return user;
   }
 
-  async updateProfile(id: number, data: Partial<User>): Promise<void> {
+  async update(id: number, data: Partial<User>): Promise<void> {
     const user = await this.findOneById(id);
-    await this.updateUserById(user.id, data);
+    if (!user) {
+      throw new NotFoundException(NotFoundEnum.user);
+    }
+
+    await this.updateUserById(id, data);
   }
 
   async changePassword(id: number, data: ChangePasswordDto): Promise<void> {

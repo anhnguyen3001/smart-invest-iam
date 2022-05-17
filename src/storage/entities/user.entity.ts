@@ -3,7 +3,7 @@ import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
-  ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -62,6 +62,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Otp, (otp) => otp.user)
   otps: Otp[];
 
-  @ManyToMany(() => Role, (role) => role.users)
-  roles: Role[];
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
 }

@@ -27,6 +27,7 @@ import {
 import { IJWTPayload, ILoginSocialInfo } from './interfaces';
 import { NotFoundException } from 'common/exceptions';
 import { NotFoundEnum } from 'common/constants/apiCode';
+import { RoleService } from 'role/role.service';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +36,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly otpService: OtpService,
+    private readonly roleService: RoleService,
   ) {}
 
   async login(dto: LoginDto): Promise<TokenResult> {
@@ -64,6 +66,8 @@ export class AuthService {
   }
 
   async signup(dto: SignupDto): Promise<User> {
+    dto.validate();
+
     const { confirmPassword, ...restDto } = dto;
     const user = await this.userService.create(restDto);
 

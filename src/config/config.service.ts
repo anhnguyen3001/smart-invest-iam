@@ -71,6 +71,7 @@ configService.ensureValues([
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
   'RESET_PASS_KEY',
+  'USER_ROLE_CODE',
 ]);
 
 export { configService };

@@ -62,7 +62,7 @@ export class UserController {
     @GetUserId() id: number,
     @Body() dto: UpdateProfileDto,
   ): Promise<void> {
-    await this.userService.updateProfile(id, dto);
+    await this.userService.update(id, dto);
   }
 
   @Post('change-password')
