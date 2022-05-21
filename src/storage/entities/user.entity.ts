@@ -62,6 +62,8 @@ export class User extends BaseEntity {
   @OneToMany(() => Otp, (otp) => otp.user)
   otps: Otp[];
 
-  @ManyToOne(() => Role, (role) => role.users)
+  @ManyToOne(() => Role, (role) => role.users, {
+    nullable: true,
+  })
   role: Role;
 }

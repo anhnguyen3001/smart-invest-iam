@@ -58,9 +58,9 @@ export class addAuthorization1649527616389 implements MigrationInterface {
         deleted_at TIMESTAMP(6) NULL,
         route VARCHAR(255) NOT NULL,
         method ENUM('GET', 'POST', 'PUT', 'DELETE') NOT NULL,
-        permission_id INT(11) NOT NULL,
+        permission_id INT(11) NULL,
         CONSTRAINT fk_route_permission FOREIGN KEY (permission_id)
-        REFERENCES permissions(id) ON UPDATE CASCADE ON DELETE CASCADE
+        REFERENCES permissions(id) ON UPDATE CASCADE ON DELETE SET NULL
       );
     `);
   }

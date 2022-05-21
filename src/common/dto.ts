@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -59,4 +59,10 @@ export class Pagination {
 
   @ApiProperty({ default: 0 })
   totalPages: number;
+}
+
+export class ResponseWithPagination {
+  @Expose()
+  @ApiProperty({ type: Pagination })
+  pagination: Pagination;
 }

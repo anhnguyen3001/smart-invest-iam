@@ -7,16 +7,12 @@ import { paginate } from 'common/utils/core';
 import { PermissionService } from 'permission/permission.service';
 import { Role } from 'storage/entities/role.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { UserService } from 'user/user.service';
 import { CreateRoleDto, SearchRoleDto, UpdateRoleDto } from './role.dto';
-import { RemovedUsedRoleException } from './role.exception';
 
 @Injectable()
 export class RoleService {
   constructor(
     @InjectRepository(Role) private roleRepo: Repository<Role>,
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
     private readonly permisionService: PermissionService,
   ) {}
 
@@ -41,18 +37,16 @@ export class RoleService {
   }
 
   async createRole(data: CreateRoleDto): Promise<Role> {
-    const { name, code } = data;
-
-    const role = await this.findOneByCode(code);
+    const role = await this.findOneByCode(data.code);
     if (role) {
       throw new ExistedException(EntityEnum.role);
     }
 
-    return this.roleRepo.save(this.roleRepo.create({ name, code }));
+    return this.roleRepo.save(this.roleRepo.create(data));
   }
 
   async updateRole(id: number, data: UpdateRoleDto): Promise<Role> {
-    const role = await this.roleRepo.findOne({ id });
+    const role = await this.findOneById(id);
     if (!role) {
       throw new NotFoundException(EntityEnum.role);
     }
@@ -75,14 +69,9 @@ export class RoleService {
   }
 
   async deleteRole(id: number): Promise<void> {
-    const role = await this.roleRepo.findOne({ id });
+    const role = await this.findOneById(id);
     if (!role) {
       throw new NotFoundException(EntityEnum.role);
-    }
-
-    const users = await this.userService.findBy({ role: { id } });
-    if (users.length) {
-      throw new RemovedUsedRoleException();
     }
 
     await this.roleRepo.softRemove(role);
@@ -90,6 +79,10 @@ export class RoleService {
 
   async findOneByCode(code: string): Promise<Role> {
     return this.roleRepo.findOne({ code });
+  }
+
+  async findOneById(id: number): Promise<Role> {
+    return this.roleRepo.findOne({ id });
   }
 
   getQueryBuilder(dto: SearchRoleDto): SelectQueryBuilder<Role> {
@@ -100,7 +93,7 @@ export class RoleService {
     if (q) {
       queryBuilder = queryBuilder.andWhere(
         new Brackets((qb) => {
-          qb.where('block.id = :id', { id: q }).orWhere('block.name LIKE :q', {
+          qb.where('role.id = :id', { id: q }).orWhere('role.name LIKE :q', {
             q: `%${q}%`,
           });
         }),

@@ -52,7 +52,8 @@ export class Role extends BaseEntity {
   permissions: Permission[];
 
   @OneToMany(() => User, (user) => user.role, {
-    cascade: true,
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
   })
   users: User[];
 }

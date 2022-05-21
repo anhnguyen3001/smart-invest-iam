@@ -6,7 +6,7 @@ export class removeUserRoles1652709905860 implements MigrationInterface {
       ALTER TABLE users
       ADD COLUMN role_id INT(11),
       ADD CONSTRAINT fk_user_role
-      FOREIGN KEY (role_id) REFERENCES roles(id);
+      FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE SET NULL;
     `);
 
     await queryRunner.query(`

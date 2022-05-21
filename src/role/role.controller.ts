@@ -12,6 +12,7 @@ import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -48,14 +49,28 @@ export class RoleController {
   @ApiOkBaseResponse(SearchRolesResult, {
     description: 'Get roles by queries successfully',
   })
-  async getListRoles(@Query() dto: SearchRoleDto): Promise<SearchRolesResult> {
-    return this.roleService.getListRoles(dto);
+  async getListRoles(
+    @Query() dto: SearchRoleDto,
+  ): Promise<BaseResponse<SearchRolesResult>> {
+    const roles = await this.roleService.getListRoles(dto);
+    return getBaseResponse(
+      {
+        data: roles,
+      },
+      SearchRolesResult,
+    );
   }
 
   @Post()
   @HttpCode(200)
   @ApiOperation({
     summary: 'Upsert role',
+  })
+  @ApiParam({
+    name: 'roleId',
+    type: 'number',
+    required: false,
+    description: 'Use for updating role',
   })
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert role successfully',
@@ -68,14 +83,14 @@ export class RoleController {
       // Update role
       const dto = await transformDtoWithoutGlobalPipe(upsertDto, UpdateRoleDto);
 
-      const category = await this.roleService.updateRole(
+      const role = await this.roleService.updateRole(
         upsertQueryDto.roleId,
         dto,
       );
       return getBaseResponse(
         {
           data: {
-            id: category.id,
+            id: role.id,
           },
           code: ApiCode[200].UPDATE_SUCCESS.code,
           message: ApiCode[200].UPDATE_SUCCESS.description,
@@ -87,11 +102,11 @@ export class RoleController {
     // Create role
     const dto = await transformDtoWithoutGlobalPipe(upsertDto, CreateRoleDto);
 
-    const category = await this.roleService.createRole(dto);
+    const role = await this.roleService.createRole(dto);
     return getBaseResponse(
       {
         data: {
-          id: category.id,
+          id: role.id,
         },
         code: ApiCode[201].CREATE_SUCCESS.code,
         message: ApiCode[201].CREATE_SUCCESS.description,
@@ -109,7 +124,7 @@ export class RoleController {
     status: 204,
     description: 'Delete role successfully',
   })
-  async deleteOneCategory(@Param() params: RequestParamId): Promise<void> {
+  async deleteRole(@Param() params: RequestParamId): Promise<void> {
     await this.roleService.deleteRole(params.id);
   }
 }

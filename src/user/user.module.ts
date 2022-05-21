@@ -6,11 +6,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [
-    StorageModule.getMySQLModule(),
-    JwtModule.register({}),
-    forwardRef(() => RoleModule),
-  ],
+  imports: [StorageModule.getMySQLModule(), JwtModule.register({}), RoleModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

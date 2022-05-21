@@ -1,7 +1,6 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
-  IsArray,
   IsIn,
   IsNumber,
   IsOptional,
@@ -10,31 +9,31 @@ import {
   MinLength,
 } from 'class-validator';
 import { QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { Role } from 'storage/entities/role.entity';
+import { Permission } from 'storage/entities/permission.entity';
 
-const ROLE_SORT_BY = ['id', 'createdAt', 'updatedAt'];
-export class SearchRoleDto extends QueryCoreDto {
-  @ApiProperty({ enum: ROLE_SORT_BY, default: 'id', required: false })
-  @IsIn(ROLE_SORT_BY)
+const PERMISSION_SORT_BY = ['id', 'createdAt', 'updatedAt'];
+export class SearchPermissionDto extends QueryCoreDto {
+  @ApiProperty({ enum: PERMISSION_SORT_BY, default: 'id', required: false })
+  @IsIn(PERMISSION_SORT_BY)
   @IsOptional()
   sortBy?: string = 'id';
 }
 
-export class SearchRolesResult extends ResponseWithPagination {
+export class SearchPermissionsResult extends ResponseWithPagination {
   @Expose()
-  @ApiResponseProperty({ type: [Role] })
-  @Type(() => Role)
-  roles: Role[];
+  @ApiResponseProperty({ type: [Permission] })
+  @Type(() => Permission)
+  permissions: Permission[];
 }
 
-export class UpsertRoleQueryDto {
+export class UpsertPermissionQueryDto {
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
-  roleId?: number;
+  permissionId?: number;
 }
 
-export class CreateRoleDto {
+export class CreatePermissionDto {
   @IsString()
   @MinLength(1)
   @MaxLength(255)
@@ -46,15 +45,10 @@ export class CreateRoleDto {
   code: string;
 }
 
-export class UpdateRoleDto {
+export class UpdatePermissionDto {
   @IsString()
   @MinLength(1)
   @MaxLength(255)
   @IsOptional()
   name?: string;
-
-  @IsNumber({}, { each: true })
-  @IsArray()
-  @IsOptional()
-  permissionIds?: number[];
 }
