@@ -17,8 +17,8 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { GetUser, GetUserId } from 'common/decorators/get-user.decorator';
+import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
+import { GetUser, GetUserId } from 'common/decorators/user.decorator';
 import { Public } from 'common/decorators/public.decorator';
 import { RtGuard } from 'common/guards/rt.guard';
 import { BaseResponse } from 'common/types/api-response.type';

@@ -49,22 +49,13 @@ export class UserService {
       }),
     );
 
-    const role = await this.roleService.findOneByCode(
-      configService.getValue('USER_ROLE_CODE'),
+    const role = await this.roleService.findOneAndThrowNotFound(
+      { code: configService.getValue('USER_ROLE_CODE') },
+      true,
     );
-    if (!role) {
-      throw new NotFoundException(EntityEnum.role);
-    }
+    user.role = role;
 
-    await this.userRepo.update(
-      { id: user.id },
-      {
-        ...user,
-        role,
-      },
-    );
-
-    return user;
+    return this.userRepo.save(user);
   }
 
   async update(id: number, data: Partial<User>): Promise<void> {

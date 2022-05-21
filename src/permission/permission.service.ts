@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityEnum } from 'common/constants/apiCode';
-import { Pagination } from 'common/dto';
 import { ExistedException } from 'common/exceptions';
 import { paginate } from 'common/utils/core';
 import { Permission } from 'storage/entities/permission.entity';
@@ -9,6 +8,7 @@ import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import {
   CreatePermissionDto,
   SearchPermissionDto,
+  SearchPermissionsResponse,
   UpdatePermissionDto,
 } from './permission.dto';
 
@@ -19,10 +19,9 @@ export class PermissionService {
     private permissionRepo: Repository<Permission>,
   ) {}
 
-  async getListPermissions(dto: SearchPermissionDto): Promise<{
-    pagination: Pagination;
-    permissions: Permission[];
-  }> {
+  async getListPermissions(
+    dto: SearchPermissionDto,
+  ): Promise<SearchPermissionsResponse> {
     const { page = 1, pageSize = 10 } = dto;
 
     const {
@@ -55,21 +54,13 @@ export class PermissionService {
     id: number,
     data: UpdatePermissionDto,
   ): Promise<Permission> {
-    const permission = await this.findOneById(id);
-    if (!permission) {
-      throw new NotFoundException(EntityEnum.role);
-    }
-
+    const permission = await this.findOneAndThrowNotFound({ id }, true);
     this.permissionRepo.merge(permission, data);
     return this.permissionRepo.save(permission);
   }
 
   async deletePermission(id: number): Promise<void> {
-    const permission = await this.findOneById(id);
-    if (!permission) {
-      throw new NotFoundException(EntityEnum.permission);
-    }
-
+    const permission = await this.findOneAndThrowNotFound({ id }, true);
     await this.permissionRepo.softRemove(permission);
   }
 
@@ -80,8 +71,15 @@ export class PermissionService {
       .getMany();
   }
 
-  async findOneById(id: number): Promise<Permission> {
-    return this.permissionRepo.findOne({ id });
+  async findOneAndThrowNotFound(
+    condition: Partial<Permission>,
+    throwNotFound?: boolean,
+  ): Promise<Permission> {
+    const perrmission = await this.permissionRepo.findOne(condition);
+    if (throwNotFound && !perrmission) {
+      throw new NotFoundException(EntityEnum.permission);
+    }
+    return perrmission;
   }
 
   getQueryBuilder(dto: SearchPermissionDto): SelectQueryBuilder<Permission> {

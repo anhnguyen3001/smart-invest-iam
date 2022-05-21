@@ -57,7 +57,7 @@ export class UpdateProfileDto {
   avatar?: string;
 }
 
-export class UserResultDto {
+export class UserResponseDto {
   @Expose()
   @ApiResponseProperty({ type: User })
   @Type(() => User)

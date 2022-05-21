@@ -9,10 +9,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { QueryCoreDto, ResponseWithPagination } from 'common/dto';
+import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { Role } from 'storage/entities/role.entity';
 
-const ROLE_SORT_BY = ['id', 'createdAt', 'updatedAt'];
+const ROLE_SORT_BY = BASE_SORT_BY;
 export class SearchRoleDto extends QueryCoreDto {
   @ApiProperty({ enum: ROLE_SORT_BY, default: 'id', required: false })
   @IsIn(ROLE_SORT_BY)
@@ -20,18 +20,11 @@ export class SearchRoleDto extends QueryCoreDto {
   sortBy?: string = 'id';
 }
 
-export class SearchRolesResult extends ResponseWithPagination {
+export class SearchRolesResponse extends ResponseWithPagination {
   @Expose()
   @ApiResponseProperty({ type: [Role] })
   @Type(() => Role)
   roles: Role[];
-}
-
-export class UpsertRoleQueryDto {
-  @IsNumber()
-  @Type(() => Number)
-  @IsOptional()
-  roleId?: number;
 }
 
 export class CreateRoleDto {

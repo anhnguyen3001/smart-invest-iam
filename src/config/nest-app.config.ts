@@ -2,7 +2,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import { GlobalExceptionsFilter } from 'common/exceptions';
 import { DEFAULT_VALIDATION_PIPE } from 'common/pipe';
-import { exceptionFactoryValidationPipe } from 'common/utils/exception';
 
 export const configNestApp = (app: INestApplication) => {
   app.use(bodyParser.json({ limit: '10mb' }));

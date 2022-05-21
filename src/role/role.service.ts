@@ -1,13 +1,17 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityEnum } from 'common/constants/apiCode';
-import { Pagination } from 'common/dto';
 import { ExistedException, NotFoundException } from 'common/exceptions';
 import { paginate } from 'common/utils/core';
 import { PermissionService } from 'permission/permission.service';
 import { Role } from 'storage/entities/role.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { CreateRoleDto, SearchRoleDto, UpdateRoleDto } from './role.dto';
+import {
+  CreateRoleDto,
+  SearchRoleDto,
+  SearchRolesResponse,
+  UpdateRoleDto,
+} from './role.dto';
 
 @Injectable()
 export class RoleService {
@@ -16,10 +20,7 @@ export class RoleService {
     private readonly permisionService: PermissionService,
   ) {}
 
-  async getListRoles(dto: SearchRoleDto): Promise<{
-    pagination: Pagination;
-    roles: Role[];
-  }> {
+  async getListRoles(dto: SearchRoleDto): Promise<SearchRolesResponse> {
     const { page = 1, pageSize = 10 } = dto;
 
     const { items, meta } = await paginate(this.getQueryBuilder(dto), {
@@ -37,7 +38,7 @@ export class RoleService {
   }
 
   async createRole(data: CreateRoleDto): Promise<Role> {
-    const role = await this.findOneByCode(data.code);
+    const role = await this.findOneAndThrowNotFound({ code: data.code });
     if (role) {
       throw new ExistedException(EntityEnum.role);
     }
@@ -46,10 +47,7 @@ export class RoleService {
   }
 
   async updateRole(id: number, data: UpdateRoleDto): Promise<Role> {
-    const role = await this.findOneById(id);
-    if (!role) {
-      throw new NotFoundException(EntityEnum.role);
-    }
+    const role = await this.findOneAndThrowNotFound({ id }, true);
 
     const { permissionIds, ...restData } = data;
     if (permissionIds?.length) {
@@ -69,20 +67,20 @@ export class RoleService {
   }
 
   async deleteRole(id: number): Promise<void> {
-    const role = await this.findOneById(id);
-    if (!role) {
-      throw new NotFoundException(EntityEnum.role);
-    }
+    const role = await this.findOneAndThrowNotFound({ id }, true);
 
     await this.roleRepo.softRemove(role);
   }
 
-  async findOneByCode(code: string): Promise<Role> {
-    return this.roleRepo.findOne({ code });
-  }
-
-  async findOneById(id: number): Promise<Role> {
-    return this.roleRepo.findOne({ id });
+  async findOneAndThrowNotFound(
+    condition: Partial<Role>,
+    throwNotFound?: boolean,
+  ): Promise<Role> {
+    const role = await this.roleRepo.findOne(condition);
+    if (throwNotFound && !role) {
+      throw new NotFoundException(EntityEnum.role);
+    }
+    return role;
   }
 
   getQueryBuilder(dto: SearchRoleDto): SelectQueryBuilder<Role> {

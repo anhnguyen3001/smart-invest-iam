@@ -12,13 +12,13 @@ import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
-import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { Identity, RequestParamId } from 'common/dto';
+import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
+import { ApiUpsertIdParam } from 'common/decorators/request.decorator';
+import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
 import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
@@ -26,9 +26,8 @@ import { configService } from 'config/config.service';
 import {
   CreateRoleDto,
   SearchRoleDto,
-  SearchRolesResult,
+  SearchRolesResponse,
   UpdateRoleDto,
-  UpsertRoleQueryDto,
 } from './role.dto';
 import { RoleService } from './role.service';
 
@@ -38,7 +37,7 @@ import { RoleService } from './role.service';
   path: 'roles',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, SearchRolesResult, Identity)
+@ApiExtraModels(BaseResponse, SearchRolesResponse, Identity)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
@@ -46,18 +45,18 @@ export class RoleController {
   @ApiOperation({
     summary: 'Get roles by queries',
   })
-  @ApiOkBaseResponse(SearchRolesResult, {
+  @ApiOkBaseResponse(SearchRolesResponse, {
     description: 'Get roles by queries successfully',
   })
   async getListRoles(
     @Query() dto: SearchRoleDto,
-  ): Promise<BaseResponse<SearchRolesResult>> {
-    const roles = await this.roleService.getListRoles(dto);
+  ): Promise<BaseResponse<SearchRolesResponse>> {
+    const data = await this.roleService.getListRoles(dto);
     return getBaseResponse(
       {
-        data: roles,
+        data,
       },
-      SearchRolesResult,
+      SearchRolesResponse,
     );
   }
 
@@ -66,27 +65,19 @@ export class RoleController {
   @ApiOperation({
     summary: 'Upsert role',
   })
-  @ApiParam({
-    name: 'roleId',
-    type: 'number',
-    required: false,
-    description: 'Use for updating role',
-  })
+  @ApiUpsertIdParam('Use for updating role')
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert role successfully',
   })
   async upsertRole(
     @Body() upsertDto: unknown,
-    @Query() upsertQueryDto: UpsertRoleQueryDto,
+    @Query() upsertQueryDto: UpsertQueryDto,
   ): Promise<BaseResponse<Identity>> {
-    if (!!upsertQueryDto.roleId) {
+    if (!!upsertQueryDto.id) {
       // Update role
       const dto = await transformDtoWithoutGlobalPipe(upsertDto, UpdateRoleDto);
 
-      const role = await this.roleService.updateRole(
-        upsertQueryDto.roleId,
-        dto,
-      );
+      const role = await this.roleService.updateRole(upsertQueryDto.id, dto);
       return getBaseResponse(
         {
           data: {

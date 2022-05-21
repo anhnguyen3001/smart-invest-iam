@@ -14,12 +14,16 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { GetUserId } from 'common/decorators/get-user.decorator';
+import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
+import { GetUserId } from 'common/decorators/user.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
-import { ChangePasswordDto, UpdateProfileDto, UserResultDto } from './user.dto';
+import {
+  ChangePasswordDto,
+  UpdateProfileDto,
+  UserResponseDto,
+} from './user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -28,7 +32,7 @@ import { UserService } from './user.service';
   path: 'user',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, UserResultDto)
+@ApiExtraModels(BaseResponse, UserResponseDto)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -36,18 +40,18 @@ export class UserController {
   @ApiOperation({
     summary: 'Get user info',
   })
-  @ApiOkBaseResponse(UserResultDto, {
+  @ApiOkBaseResponse(UserResponseDto, {
     description: 'Get user info successfully',
   })
   async getUserInfo(
     @GetUserId() id: number,
-  ): Promise<BaseResponse<UserResultDto>> {
+  ): Promise<BaseResponse<UserResponseDto>> {
     const user = await this.userService.findOneById(id);
     return getBaseResponse(
       {
         data: { user },
       },
-      UserResultDto,
+      UserResponseDto,
     );
   }
 

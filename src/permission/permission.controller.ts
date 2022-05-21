@@ -12,13 +12,13 @@ import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
-import { ApiOkBaseResponse } from 'common/decorators/api-base-response.decorator';
-import { Identity, RequestParamId } from 'common/dto';
+import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
+import { ApiUpsertIdParam } from 'common/decorators/request.decorator';
+import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
 import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
@@ -26,9 +26,8 @@ import { configService } from 'config/config.service';
 import {
   CreatePermissionDto,
   SearchPermissionDto,
-  SearchPermissionsResult,
+  SearchPermissionsResponse,
   UpdatePermissionDto,
-  UpsertPermissionQueryDto,
 } from './permission.dto';
 import { PermissionService } from './permission.service';
 
@@ -38,7 +37,7 @@ import { PermissionService } from './permission.service';
   path: 'permissions',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, SearchPermissionsResult, Identity)
+@ApiExtraModels(BaseResponse, SearchPermissionsResponse, Identity)
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
@@ -46,18 +45,18 @@ export class PermissionController {
   @ApiOperation({
     summary: 'Get permissions by queries',
   })
-  @ApiOkBaseResponse(SearchPermissionsResult, {
+  @ApiOkBaseResponse(SearchPermissionsResponse, {
     description: 'Get roles by queries successfully',
   })
   async getListRoles(
     @Query() dto: SearchPermissionDto,
-  ): Promise<BaseResponse<SearchPermissionsResult>> {
-    const permissions = await this.permissionService.getListPermissions(dto);
+  ): Promise<BaseResponse<SearchPermissionsResponse>> {
+    const data = await this.permissionService.getListPermissions(dto);
     return getBaseResponse(
       {
-        data: permissions,
+        data,
       },
-      SearchPermissionsResult,
+      SearchPermissionsResponse,
     );
   }
 
@@ -66,20 +65,15 @@ export class PermissionController {
   @ApiOperation({
     summary: 'Upsert permission',
   })
-  @ApiParam({
-    name: 'permissionId',
-    type: 'number',
-    required: false,
-    description: 'Use for updating permission',
-  })
+  @ApiUpsertIdParam('Use for updating permission')
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert permission successfully',
   })
   async upsertPermission(
     @Body() upsertDto: unknown,
-    @Query() upsertQueryDto: UpsertPermissionQueryDto,
+    @Query() upsertQueryDto: UpsertQueryDto,
   ): Promise<BaseResponse<Identity>> {
-    if (!!upsertQueryDto.permissionId) {
+    if (!!upsertQueryDto.id) {
       // Update role
       const dto = await transformDtoWithoutGlobalPipe(
         upsertDto,
@@ -87,7 +81,7 @@ export class PermissionController {
       );
 
       const permission = await this.permissionService.updatePermission(
-        upsertQueryDto.permissionId,
+        upsertQueryDto.id,
         dto,
       );
       return getBaseResponse(

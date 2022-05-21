@@ -1,10 +1,30 @@
 import {
   Paramtype,
   Type,
+  ValidationError,
   ValidationPipe,
   ValidationPipeOptions,
 } from '@nestjs/common';
-import { exceptionFactoryValidationPipe } from './utils/exception';
+import { ValidateErrorCode } from './constants/errorCode';
+import { ValidationException } from './exceptions';
+
+export const exceptionFactoryValidationPipe = (
+  validationErrors: ValidationError[],
+): ValidationException => {
+  const errorCodes = validationErrors.reduce((acc, curr) => {
+    if (Object.keys(curr.constraints).includes('whitelistValidation')) {
+      return {
+        ...acc,
+        [curr.property]: [ValidateErrorCode.UNKNOWN_FIELD],
+      };
+    }
+    return {
+      ...acc,
+      [curr.property]: Object.values(curr.constraints),
+    };
+  }, {});
+  return new ValidationException(null, null, errorCodes);
+};
 
 export const DEFAULT_VALIDATION_PIPE: ValidationPipeOptions = {
   transform: true,
