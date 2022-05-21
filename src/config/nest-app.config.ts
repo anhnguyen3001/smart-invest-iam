@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import { GlobalExceptionsFilter } from 'common/exceptions';
+import { DEFAULT_VALIDATION_PIPE } from 'common/pipe';
 import { exceptionFactoryValidationPipe } from 'common/utils/exception';
 
 export const configNestApp = (app: INestApplication) => {
@@ -13,13 +14,6 @@ export const configNestApp = (app: INestApplication) => {
   });
 
   app.enableVersioning();
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      exceptionFactory: exceptionFactoryValidationPipe,
-      stopAtFirstError: true,
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe(DEFAULT_VALIDATION_PIPE));
   app.useGlobalFilters(new GlobalExceptionsFilter());
 };

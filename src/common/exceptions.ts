@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ApiCode } from './constants/apiCode';
+import { ApiCode, EntityEnum } from './constants/apiCode';
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -71,11 +71,21 @@ export class MissingFieldHeaderException extends APIException {
 }
 
 export class NotFoundException extends APIException {
-  constructor(field: string) {
+  constructor(field: EntityEnum) {
     super(
       ApiCode[404].NOT_FOUND.code,
       HttpStatus.NOT_FOUND,
       `${field} ${ApiCode[404].NOT_FOUND.code}`,
+    );
+  }
+}
+
+export class ExistedException extends APIException {
+  constructor(field: EntityEnum) {
+    super(
+      ApiCode[400].EXISTED_ENTITY.code,
+      HttpStatus.BAD_REQUEST,
+      `${field} ${ApiCode[400].EXISTED_ENTITY.code}`,
     );
   }
 }

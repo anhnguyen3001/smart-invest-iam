@@ -6,7 +6,6 @@ import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import { UpdatePasswordDto } from 'user/user.dto';
 import { MailService } from '../external/mail/mail.service';
-import { UserExistedException } from '../user/user.exception';
 import { UserService } from '../user/user.service';
 import {
   AccessDeniedException,
@@ -25,8 +24,8 @@ import {
   VerifyOtpQueryDto,
 } from './auth.dto';
 import { IJWTPayload, ILoginSocialInfo } from './interfaces';
-import { NotFoundException } from 'common/exceptions';
-import { NotFoundEnum } from 'common/constants/apiCode';
+import { ExistedException, NotFoundException } from 'common/exceptions';
+import { EntityEnum } from 'common/constants/apiCode';
 import { RoleService } from 'role/role.service';
 
 @Injectable()
@@ -81,7 +80,7 @@ export class AuthService {
 
     const user = await this.userService.findUnverifiedUserByEmail(email, true);
     if (!user) {
-      throw new NotFoundException(NotFoundEnum.user);
+      throw new NotFoundException(EntityEnum.user);
     }
     if (user.isVerified) {
       throw new VerifiedUserException();
@@ -104,7 +103,7 @@ export class AuthService {
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
-      throw new NotFoundException(NotFoundEnum.user);
+      throw new NotFoundException(EntityEnum.user);
     }
 
     this.sendForgetPasswordMail(user);
@@ -115,7 +114,7 @@ export class AuthService {
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
-      throw new NotFoundException(NotFoundEnum.user);
+      throw new NotFoundException(EntityEnum.user);
     }
 
     await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.resetPassword);
@@ -158,7 +157,7 @@ export class AuthService {
       method: LoginMethodEnum.local,
     });
     if (!user) {
-      throw new NotFoundException(NotFoundEnum.user);
+      throw new NotFoundException(EntityEnum.user);
     }
 
     if (type === OtpTypeEnum.verifyUser) {
@@ -266,7 +265,7 @@ export class AuthService {
         isVerified: true,
       });
     } else if (method !== info.method) {
-      throw new UserExistedException();
+      throw new ExistedException(EntityEnum.user);
     }
 
     return user;

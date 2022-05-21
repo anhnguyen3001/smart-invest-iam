@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { NotFoundEnum } from 'common/constants/apiCode';
-import { NotFoundException } from 'common/exceptions';
+import { EntityEnum } from 'common/constants/apiCode';
+import { ExistedException, NotFoundException } from 'common/exceptions';
 import { configService } from 'config/config.service';
 import { RoleService } from 'role/role.service';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
@@ -11,7 +11,6 @@ import { ICreateUser, ChangePasswordDto } from './user.dto';
 import {
   LackPasswordException,
   OldPasswordWrongException,
-  UserExistedException,
 } from './user.exception';
 
 @Injectable()
@@ -31,7 +30,7 @@ export class UserService {
 
     const existedUser = await this.findVerifiedUserByEmail(data.email);
     if (existedUser) {
-      throw new UserExistedException();
+      throw new ExistedException(EntityEnum.user);
     }
 
     let hashPassword;
@@ -54,7 +53,7 @@ export class UserService {
       configService.getValue('USER_ROLE_CODE'),
     );
     if (!role) {
-      throw new NotFoundException(NotFoundEnum.role);
+      throw new NotFoundException(EntityEnum.role);
     }
 
     await this.userRepo.update(
@@ -71,7 +70,7 @@ export class UserService {
   async update(id: number, data: Partial<User>): Promise<void> {
     const user = await this.findOneById(id);
     if (!user) {
-      throw new NotFoundException(NotFoundEnum.user);
+      throw new NotFoundException(EntityEnum.user);
     }
 
     await this.updateUserById(id, data);
@@ -122,7 +121,11 @@ export class UserService {
   }
 
   async findOne(condition: FindConditions<User>): Promise<User> {
-    return this.userRepo.findOne({ where: condition });
+    return this.userRepo.findOne(condition);
+  }
+
+  async findBy(condition: FindConditions<User>): Promise<User[]> {
+    return this.userRepo.find(condition);
   }
 
   async updateUserById(id: number, data: Partial<User>): Promise<void> {

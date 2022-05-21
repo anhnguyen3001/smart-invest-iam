@@ -21,7 +21,12 @@ export const ApiCode = {
     },
   },
 
-  [HttpStatus.CREATED]: {},
+  [HttpStatus.CREATED]: {
+    CREATE_SUCCESS: {
+      code: '000',
+      description: 'Create successfully!',
+    },
+  },
 
   [HttpStatus.BAD_REQUEST]: {
     VALIDATION_ERROR: {
@@ -32,6 +37,10 @@ export const ApiCode = {
     MISSING_FIELD_HEADER: {
       code: '001',
       description: 'The something field on headers can not be found',
+    },
+    EXISTED_ENTITY: {
+      code: '002',
+      description: 'User has been existed',
     },
 
     // User
@@ -82,6 +91,12 @@ export const ApiCode = {
     UNVERIFIED_USER: {
       code: '1006',
       description: 'Your email had not been verified',
+    },
+
+    // Role
+    REMOVE_USED_ROLE: {
+      code: '2001',
+      description: 'Role is used ',
     },
   },
 
@@ -134,7 +149,8 @@ Object.entries(ApiCode).forEach(([k, v]) => {
   });
 });
 
-export enum NotFoundEnum {
+export enum EntityEnum {
   user = 'User',
   role = 'Role',
+  permission = 'Permission',
 }

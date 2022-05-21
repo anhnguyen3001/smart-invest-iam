@@ -22,22 +22,12 @@ export class OldPasswordWrongException extends APIException {
   }
 }
 
-export class UserExistedException extends APIException {
-  constructor() {
-    super(
-      ApiCode[400].USER_EXISTED.code,
-      HttpStatus.BAD_REQUEST,
-      ApiCode[400].USER_EXISTED.description,
-    );
-  }
-}
-
 export class LackPasswordException extends APIException {
   constructor() {
     super(
-      ApiCode[400].LACK_PASSWORD.code,
+      ApiCode[400].REMOVE_USED_ROLE.code,
       HttpStatus.BAD_REQUEST,
-      ApiCode[400].LACK_PASSWORD.description,
+      ApiCode[400].REMOVE_USED_ROLE.description,
     );
   }
 }
