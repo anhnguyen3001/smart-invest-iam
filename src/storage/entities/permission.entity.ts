@@ -37,6 +37,9 @@ export class Permission extends BaseEntity {
   @ManyToMany(() => Role, (role) => role.permissions)
   roles: Role[];
 
-  @OneToMany(() => Route, (route) => route.permission)
+  @OneToMany(() => Route, (route) => route.permission, {
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  })
   routes: Route[];
 }

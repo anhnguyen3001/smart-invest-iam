@@ -153,4 +153,5 @@ export enum EntityEnum {
   user = 'User',
   role = 'Role',
   permission = 'Permission',
+  route = 'Route',
 }
