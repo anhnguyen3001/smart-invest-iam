@@ -61,14 +61,14 @@ export class AuthService {
   }
 
   async logout(id: number): Promise<void> {
-    await this.userService.updateUserById(id, { refreshToken: null });
+    await this.userService.updateById(id, { refreshToken: null });
   }
 
   async signup(dto: SignupDto): Promise<User> {
     dto.validate();
 
     const { confirmPassword, ...restDto } = dto;
-    const user = await this.userService.create(restDto);
+    const user = await this.userService.createUser(restDto);
 
     this.sendVerifyUserMail(user);
 
@@ -94,7 +94,7 @@ export class AuthService {
 
     await Promise.all([
       this.otpService.deleteOtp(otp.id),
-      this.userService.updateUserById(user.id, { isVerified: true }),
+      this.userService.updateById(user.id, { isVerified: true }),
     ]);
   }
 
@@ -146,7 +146,7 @@ export class AuthService {
       throw new InvalidTokenException();
     }
 
-    await this.userService.updateUserById(id, { password });
+    await this.userService.updateById(id, { password });
   }
 
   async resendOtp(data: ResendOtpQueryDto): Promise<void> {
@@ -260,7 +260,7 @@ export class AuthService {
 
     if (!user) {
       // User login first time
-      user = await this.userService.create({
+      user = await this.userService.createUser({
         ...info,
         isVerified: true,
       });

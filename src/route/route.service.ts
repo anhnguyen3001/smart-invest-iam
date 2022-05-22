@@ -58,10 +58,7 @@ export class RouteService {
   }
 
   async updateRoute(id: number, data: UpdateRouteDto): Promise<Route> {
-    const route = await this.findOneById(id);
-    if (!route) {
-      throw new NotFoundException(EntityEnum.route);
-    }
+    const route = await this.findOneAndThrowNotFound({ id }, true);
 
     const { permissionId } = data;
     if (permissionId) {
@@ -79,10 +76,7 @@ export class RouteService {
   }
 
   async deleteRoute(id: number): Promise<void> {
-    const route = await this.findOneById(id);
-    if (!route) {
-      throw new NotFoundException(EntityEnum.route);
-    }
+    const route = await this.findOneAndThrowNotFound({ id }, true);
 
     await this.routeRepo.softRemove(route);
   }
@@ -119,8 +113,15 @@ export class RouteService {
     }
   }
 
-  async findOneById(id: number): Promise<Route> {
-    return this.routeRepo.findOne({ id });
+  async findOneAndThrowNotFound(
+    condition: Partial<Route>,
+    throwNotFound?: boolean,
+  ): Promise<Route> {
+    const route = await this.routeRepo.findOne(condition);
+    if (throwNotFound && !route) {
+      throw new NotFoundException(EntityEnum.route);
+    }
+    return route;
   }
 
   getQueryBuilder(dto: SearchRoleDto): SelectQueryBuilder<Route> {

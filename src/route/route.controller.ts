@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
-import { ApiUpsertIdParam } from 'common/decorators/request.decorator';
+import { ApiUpsertQuery } from 'common/decorators/request.decorator';
 import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
 import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
@@ -65,7 +65,7 @@ export class RouteController {
   @ApiOperation({
     summary: 'Upsert route',
   })
-  @ApiUpsertIdParam('Use for updating route')
+  @ApiUpsertQuery()
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert route successfully',
   })

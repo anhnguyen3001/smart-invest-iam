@@ -75,11 +75,11 @@ export class PermissionService {
     condition: Partial<Permission>,
     throwNotFound?: boolean,
   ): Promise<Permission> {
-    const perrmission = await this.permissionRepo.findOne(condition);
-    if (throwNotFound && !perrmission) {
+    const permission = await this.permissionRepo.findOne(condition);
+    if (throwNotFound && !permission) {
       throw new NotFoundException(EntityEnum.permission);
     }
-    return perrmission;
+    return permission;
   }
 
   getQueryBuilder(dto: SearchPermissionDto): SelectQueryBuilder<Permission> {

@@ -1,13 +1,12 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiQuery } from '@nestjs/swagger';
 
-export const ApiUpsertIdParam = (description: string) => {
+export const ApiUpsertQuery = () => {
   return applyDecorators(
-    ApiParam({
+    ApiQuery({
       name: 'id',
       type: 'number',
       required: false,
-      description,
     }),
   );
 };

@@ -3,11 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException, NotFoundException } from 'common/exceptions';
+import { paginate } from 'common/utils/core';
 import { configService } from 'config/config.service';
 import { RoleService } from 'role/role.service';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
-import { FindConditions, Repository } from 'typeorm';
-import { ICreateUser, ChangePasswordDto } from './user.dto';
+import {
+  Brackets,
+  FindConditions,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
+import {
+  ChangePasswordDto,
+  SearchUserDto,
+  SearchUsersResponse,
+  CreateUserDto,
+  UpdateUserDto,
+} from './user.dto';
 import {
   LackPasswordException,
   OldPasswordWrongException,
@@ -20,7 +32,24 @@ export class UserService {
     private readonly roleService: RoleService,
   ) {}
 
-  async create(data: ICreateUser): Promise<User> {
+  async getListUsers(dto: SearchUserDto): Promise<SearchUsersResponse> {
+    const { page = 1, pageSize = 10 } = dto;
+
+    const { items, meta } = await paginate(this.getQueryBuilder(dto), {
+      limit: pageSize,
+      page,
+    });
+
+    return {
+      users: items,
+      pagination: {
+        totalItems: meta.totalItems,
+        totalPages: meta.totalPages,
+      },
+    };
+  }
+
+  async createUser(data: CreateUserDto): Promise<User> {
     const {
       password,
       method = LoginMethodEnum.local,
@@ -58,15 +87,26 @@ export class UserService {
     return this.userRepo.save(user);
   }
 
-  async update(id: number, data: Partial<User>): Promise<void> {
-    const user = await this.findOneById(id);
-    if (!user) {
-      throw new NotFoundException(EntityEnum.user);
+  async updateUser(id: number, data: UpdateUserDto): Promise<User> {
+    const user = await this.findOneAndThrowNotFound({ id }, true);
+
+    const { password } = data;
+
+    // Update password
+    if (password) {
+      data.password = await this.hashPassword(password);
     }
 
-    await this.updateUserById(id, data);
+    return this.userRepo.save(this.userRepo.merge(user, data));
   }
 
+  async deleteUser(id: number): Promise<void> {
+    const user = await this.findOneAndThrowNotFound({ id }, true);
+
+    await this.userRepo.softRemove(user);
+  }
+
+  // TODO: BFF
   async changePassword(id: number, data: ChangePasswordDto): Promise<void> {
     data.validate();
 
@@ -78,7 +118,7 @@ export class UserService {
       throw new OldPasswordWrongException();
     }
 
-    await this.updateUserById(id, { password: newPassword });
+    await this.updateById(id, { password: newPassword });
   }
 
   async findUnverifiedUserByEmail(
@@ -107,6 +147,18 @@ export class UserService {
     });
   }
 
+  async findOneAndThrowNotFound(
+    condition: Partial<User>,
+    throwNotFound?: boolean,
+  ): Promise<User> {
+    const user = await this.userRepo.findOne(condition);
+    if (throwNotFound && !user) {
+      throw new NotFoundException(EntityEnum.user);
+    }
+    return user;
+  }
+
+  // TODO: Remove when have BFF
   async findOneById(id: number): Promise<User> {
     return this.userRepo.findOne({ id, isVerified: true });
   }
@@ -115,11 +167,7 @@ export class UserService {
     return this.userRepo.findOne(condition);
   }
 
-  async findBy(condition: FindConditions<User>): Promise<User[]> {
-    return this.userRepo.find(condition);
-  }
-
-  async updateUserById(id: number, data: Partial<User>): Promise<void> {
+  async updateById(id: number, data: Partial<User>): Promise<void> {
     const password = data.password
       ? await this.hashPassword(data.password)
       : undefined;
@@ -136,5 +184,43 @@ export class UserService {
   async hashPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt();
     return await bcrypt.hash(password, salt);
+  }
+
+  getQueryBuilder(dto: SearchUserDto): SelectQueryBuilder<User> {
+    const { page, pageSize, q, userIds, orderBy, sortBy, ...rest } = dto;
+    let queryBuilder = this.userRepo
+      .createQueryBuilder('user')
+      .leftJoin('user.role', 'role');
+
+    // search option
+    if (q) {
+      queryBuilder = queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.email LIKE :q', {
+            q: `%${q}%`,
+          }).orWhere('user.username LIKE :q', {
+            q: `%${q}%`,
+          });
+        }),
+      );
+    }
+
+    if (userIds) {
+      queryBuilder = queryBuilder.andWhere('user.id IN (:...userIds)', {
+        userIds,
+      });
+    }
+
+    // boolean option + string option
+    Object.entries(rest).forEach(([k, v]) => {
+      if (typeof v === 'boolean' || typeof v === 'string')
+        queryBuilder = queryBuilder.andWhere(`user.${k} = :${k}`, {
+          [k]: v,
+        });
+    });
+
+    queryBuilder = queryBuilder.addOrderBy(`user.${sortBy}`, orderBy);
+
+    return queryBuilder;
   }
 }

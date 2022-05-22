@@ -15,6 +15,7 @@ import { ORDER_BY } from './types/core.type';
 
 export class Identity {
   @ApiProperty({ type: 'number' })
+  @Expose()
   id: number;
 }
 
@@ -57,6 +58,7 @@ export class QueryCoreDto {
 }
 
 export class UpsertQueryDto {
+  @ApiProperty({ type: 'number', required: false })
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
