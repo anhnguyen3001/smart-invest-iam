@@ -19,7 +19,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
-import { Public } from 'common/decorators/public.decorator';
 import {
   ApiUpsertBody,
   ApiUpsertQuery,
@@ -71,7 +70,6 @@ export class UserController {
     );
   }
 
-  @Public()
   @Post()
   @HttpCode(200)
   @ApiOperation({

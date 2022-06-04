@@ -90,11 +90,24 @@ export class UserService {
   async updateUser(id: number, data: UpdateUserDto): Promise<User> {
     const user = await this.findOneAndThrowNotFound({ id }, true);
 
-    const { password } = data;
+    const { password, roleId } = data;
 
     // Update password
     if (password) {
       data.password = await this.hashPassword(password);
+    }
+
+    // Update role
+    if (roleId) {
+      const role = await this.roleService.findOneAndThrowNotFound(
+        {
+          id: roleId,
+        },
+        true,
+      );
+
+      user.role = role;
+      delete data.roleId;
     }
 
     return this.userRepo.save(this.userRepo.merge(user, data));
