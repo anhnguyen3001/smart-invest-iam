@@ -131,9 +131,8 @@ export class UpdateUserDto extends PartialType(
   @IsOptional()
   avatar?: string;
 
-  @ApiProperty({ type: 'string', required: false })
-  @IsNumber({}, { each: true })
-  @IsArray()
+  @ApiProperty({ type: 'number', required: false })
+  @IsNumber()
   @IsOptional()
-  roleIds?: number[];
+  roleId?: number;
 }

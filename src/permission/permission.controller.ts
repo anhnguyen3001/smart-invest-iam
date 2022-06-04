@@ -17,7 +17,10 @@ import {
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
-import { ApiUpsertQuery } from 'common/decorators/request.decorator';
+import {
+  ApiUpsertBody,
+  ApiUpsertQuery,
+} from 'common/decorators/request.decorator';
 import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
 import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
@@ -66,6 +69,7 @@ export class PermissionController {
     summary: 'Upsert permission',
   })
   @ApiUpsertQuery()
+  @ApiUpsertBody(CreatePermissionDto, UpdatePermissionDto)
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert permission successfully',
   })

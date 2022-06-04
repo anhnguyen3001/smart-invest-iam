@@ -1,5 +1,10 @@
-import { applyDecorators } from '@nestjs/common';
-import { ApiQuery } from '@nestjs/swagger';
+import { applyDecorators, Type } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiQuery,
+  IntersectionType,
+  PartialType,
+} from '@nestjs/swagger';
 
 export const ApiUpsertQuery = () => {
   return applyDecorators(
@@ -7,6 +12,14 @@ export const ApiUpsertQuery = () => {
       name: 'id',
       type: 'number',
       required: false,
+    }),
+  );
+};
+
+export const ApiUpsertBody = (CreateDto: Type, UpdateDto: Type) => {
+  return applyDecorators(
+    ApiBody({
+      type: PartialType(IntersectionType(CreateDto, UpdateDto)),
     }),
   );
 };

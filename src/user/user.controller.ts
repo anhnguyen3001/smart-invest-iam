@@ -20,7 +20,10 @@ import {
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
 import { Public } from 'common/decorators/public.decorator';
-import { ApiUpsertQuery } from 'common/decorators/request.decorator';
+import {
+  ApiUpsertBody,
+  ApiUpsertQuery,
+} from 'common/decorators/request.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
 import { GetUserId } from 'common/decorators/user.decorator';
 import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
@@ -75,6 +78,7 @@ export class UserController {
     summary: 'Upsert user',
   })
   @ApiUpsertQuery()
+  @ApiUpsertBody(CreateUserDto, UpdateUserDto)
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert user successfully',
   })
