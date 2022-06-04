@@ -33,11 +33,13 @@ export class SearchRolesResponse extends ResponseWithPagination {
 }
 
 export class CreateRoleDto {
+  @ApiProperty({ type: 'string' })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
   name: string;
 
+  @ApiProperty({ type: 'string' })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
@@ -47,6 +49,7 @@ export class CreateRoleDto {
 export class UpdateRoleDto extends PartialType(
   PickType(CreateRoleDto, ['name']),
 ) {
+  @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
   @IsArray()
   @IsOptional()

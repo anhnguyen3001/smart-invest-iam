@@ -31,11 +31,13 @@ export class SearchPermissionsResponse extends ResponseWithPagination {
 }
 
 export class CreatePermissionDto {
+  @ApiProperty({ type: 'string' })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
   name: string;
 
+  @ApiProperty({ type: 'string' })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
