@@ -1,4 +1,9 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiResponseProperty,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsIn,
@@ -37,10 +42,6 @@ export class CreatePermissionDto {
   code: string;
 }
 
-export class UpdatePermissionDto {
-  @IsString()
-  @MinLength(1)
-  @MaxLength(255)
-  @IsOptional()
-  name?: string;
-}
+export class UpdatePermissionDto extends PartialType(
+  PickType(CreatePermissionDto, ['name']),
+) {}

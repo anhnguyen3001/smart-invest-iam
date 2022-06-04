@@ -1,4 +1,4 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty, PartialType } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsEnum,
@@ -41,18 +41,4 @@ export class CreateRouteDto {
   permissionId?: number;
 }
 
-export class UpdateRouteDto {
-  @IsString()
-  @MinLength(1)
-  @MaxLength(255)
-  @IsOptional()
-  name?: string;
-
-  @IsEnum(MethodEnum)
-  @IsOptional()
-  method?: MethodEnum;
-
-  @IsNumber()
-  @IsOptional()
-  permissionId?: number;
-}
+export class UpdateRouteDto extends PartialType(CreateRouteDto) {}

@@ -1,4 +1,9 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiResponseProperty,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsArray,
@@ -118,19 +123,17 @@ export class CreateUserDto {
   method?: LoginMethodEnum;
 }
 
-export class UpdateUserDto {
-  @ApiProperty({ type: 'string', required: false })
-  @IsString()
-  @IsOptional()
-  username?: string;
-
+export class UpdateUserDto extends PartialType(
+  PickType(CreateUserDto, ['username', 'password']),
+) {
   @ApiProperty({ type: 'string', required: false })
   @IsString()
   @IsOptional()
   avatar?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  @IsString()
+  @IsNumber({}, { each: true })
+  @IsArray()
   @IsOptional()
-  password?: string;
+  roleIds?: number[];
 }

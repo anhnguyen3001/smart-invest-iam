@@ -1,4 +1,9 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiResponseProperty,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsArray,
@@ -39,13 +44,9 @@ export class CreateRoleDto {
   code: string;
 }
 
-export class UpdateRoleDto {
-  @IsString()
-  @MinLength(1)
-  @MaxLength(255)
-  @IsOptional()
-  name?: string;
-
+export class UpdateRoleDto extends PartialType(
+  PickType(CreateRoleDto, ['name']),
+) {
   @IsNumber({}, { each: true })
   @IsArray()
   @IsOptional()
