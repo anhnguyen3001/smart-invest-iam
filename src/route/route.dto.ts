@@ -28,14 +28,17 @@ export class SearchRoutesResponse extends ResponseWithPagination {
 }
 
 export class CreateRouteDto {
+  @ApiProperty({ type: 'string' })
   @IsString()
   @MinLength(1)
   @MaxLength(255)
   route: string;
 
+  @ApiProperty({ enum: MethodEnum })
   @IsEnum(MethodEnum)
   method: MethodEnum;
 
+  @ApiProperty({ type: Number, required: false })
   @IsNumber()
   @IsOptional()
   permissionId?: number;

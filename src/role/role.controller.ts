@@ -16,11 +16,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
+import { ApiUpsert } from 'common/decorators/request.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
-import {
-  ApiUpsertBody,
-  ApiUpsertQuery,
-} from 'common/decorators/request.decorator';
 import { Identity, RequestParamId, UpsertQueryDto } from 'common/dto';
 import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
@@ -68,8 +65,7 @@ export class RoleController {
   @ApiOperation({
     summary: 'Upsert role',
   })
-  @ApiUpsertQuery()
-  @ApiUpsertBody(CreateRoleDto, UpdateRoleDto)
+  @ApiUpsert(CreateRoleDto, UpdateRoleDto)
   @ApiOkBaseResponse(Identity, {
     description: 'Upsert role successfully',
   })

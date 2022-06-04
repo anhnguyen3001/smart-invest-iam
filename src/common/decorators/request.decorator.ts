@@ -1,25 +1,34 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
   ApiBody,
+  ApiExtraModels,
   ApiQuery,
-  IntersectionType,
-  PartialType,
+  getSchemaPath,
 } from '@nestjs/swagger';
 
-export const ApiUpsertQuery = () => {
+export const ApiUpsert = (CreateDto: Type, UpdateDto: Type) => {
+  const createSchemaPath = getSchemaPath(CreateDto);
+  const updateSchemaPath = getSchemaPath(UpdateDto);
+
   return applyDecorators(
     ApiQuery({
       name: 'id',
       type: 'number',
       required: false,
     }),
-  );
-};
-
-export const ApiUpsertBody = (CreateDto: Type, UpdateDto: Type) => {
-  return applyDecorators(
     ApiBody({
-      type: PartialType(IntersectionType(CreateDto, UpdateDto)),
+      schema: {
+        oneOf: [{ $ref: createSchemaPath }, { $ref: updateSchemaPath }],
+      },
+      examples: {
+        'Create Dto': {
+          $ref: createSchemaPath,
+        },
+        'Update Dto': {
+          $ref: updateSchemaPath,
+        },
+      },
     }),
+    ApiExtraModels(CreateDto, UpdateDto),
   );
 };
