@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiExtraModels,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -37,7 +36,6 @@ import { PermissionService } from './permission.service';
   path: 'permissions',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, SearchPermissionsResponse, Identity)
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 

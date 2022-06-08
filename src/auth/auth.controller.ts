@@ -11,41 +11,38 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'common/decorators/public.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
 import { GetUser, GetUserId } from 'common/decorators/user.decorator';
-import { Public } from 'common/decorators/public.decorator';
 import { RtGuard } from 'common/guards/rt.guard';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
+import { Request } from 'express';
 import { User } from 'storage/entities/user.entity';
 import { UpdatePasswordDto } from 'user/user.dto';
-import { AuthService } from './auth.service';
 import {
   ForgetPasswordDto,
   LoginDto,
   LoginSocialDto,
+  OtpTokenResult,
   ResendOtpQueryDto,
   SignupDto,
   TokenResult,
   VerifyOtpQueryDto,
-  OtpTokenResult,
 } from './auth.dto';
+import { AuthService } from './auth.service';
 import { FBAuthGuard, GoogleAuthGuard } from './guards';
-import { Request } from 'express';
 
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, OtpTokenResult, TokenResult)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -66,29 +63,35 @@ export class AuthController {
   @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
-  @ApiQuery({ type: LoginSocialDto })
   @ApiOperation({
     summary: 'Login Facebook',
   })
   @ApiOkBaseResponse(TokenResult, {
     description: 'Login facebook successfully',
   })
-  async loginFB(@GetUser() user: User): Promise<TokenResult> {
-    return this.authService.loginSocial(user);
+  async loginFB(
+    @Query() _: LoginSocialDto,
+    @GetUser() user: User,
+  ): Promise<BaseResponse<TokenResult>> {
+    const tokens = await this.authService.loginSocial(user);
+    return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
   @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google')
-  @ApiQuery({ type: LoginSocialDto })
   @ApiOperation({
     summary: 'Login Google',
   })
   @ApiOkBaseResponse(TokenResult, {
     description: 'Login google successfully',
   })
-  async loginGoogle(@GetUser() user: User): Promise<TokenResult> {
-    return this.authService.loginSocial(user);
+  async loginGoogle(
+    @Query() _: LoginSocialDto,
+    @GetUser() user: User,
+  ): Promise<BaseResponse<TokenResult>> {
+    const tokens = await this.authService.loginSocial(user);
+    return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
   @Get('logout')

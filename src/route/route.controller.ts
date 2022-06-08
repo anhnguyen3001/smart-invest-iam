@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiExtraModels,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -37,7 +36,6 @@ import { RouteService } from './route.service';
   path: 'routes',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, SearchRoutesResponse, Identity)
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
 

@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiExtraModels,
   ApiNoContentResponse,
   ApiOperation,
   ApiResponse,
@@ -44,7 +43,6 @@ import { UserService } from './user.service';
   path: 'users',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, UserResponseDto)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

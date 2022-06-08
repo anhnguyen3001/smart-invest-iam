@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiExtraModels,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -37,7 +36,6 @@ import { RoleService } from './role.service';
   path: 'roles',
   version: configService.getValue('API_VERSION'),
 })
-@ApiExtraModels(BaseResponse, SearchRolesResponse, Identity)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 

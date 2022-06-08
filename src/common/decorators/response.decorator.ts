@@ -1,5 +1,6 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import {
+  ApiExtraModels,
   ApiOkResponse,
   ApiResponseOptions,
   getSchemaPath,
@@ -22,5 +23,6 @@ export const ApiOkBaseResponse = <TModel extends Type<any>>(
         },
       },
     }),
+    ApiExtraModels(BaseResponse, model),
   );
 };
