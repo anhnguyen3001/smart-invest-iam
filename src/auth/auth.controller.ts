@@ -108,6 +108,7 @@ export class AuthController {
     description: 'Sign up successfully',
   })
   async signup(@Body() dto: SignupDto): Promise<void> {
+    console.log('signup');
     await this.authService.signup(dto);
   }
 

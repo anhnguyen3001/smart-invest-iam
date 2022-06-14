@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Permission } from './permission.entity';
@@ -12,16 +13,19 @@ export enum MethodEnum {
 
 @Entity('routes')
 export class Route extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @Expose()
   @ApiProperty({ type: 'number' })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Expose()
   @ApiProperty({ type: 'string' })
+  @Column({ length: 255 })
   route: string;
 
-  @Column({ enum: MethodEnum })
+  @Expose()
   @ApiProperty({ enum: MethodEnum })
+  @Column({ enum: MethodEnum })
   method: MethodEnum;
 
   @ManyToOne(() => Permission, (permission) => permission.routes, {

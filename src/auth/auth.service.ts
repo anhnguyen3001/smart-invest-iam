@@ -66,10 +66,11 @@ export class AuthService {
 
   async signup(dto: SignupDto): Promise<User> {
     dto.validate();
-
+    console.log('user validate ');
     const { confirmPassword, ...restDto } = dto;
+    console.log('user 1');
     const user = await this.userService.createUser(restDto);
-
+    console.log('user ');
     this.sendVerifyUserMail(user);
 
     return user;

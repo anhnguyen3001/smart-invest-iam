@@ -68,7 +68,7 @@ export class UserService {
 
       hashPassword = await this.hashPassword(password);
     }
-
+    console.log('rest');
     const user = await this.userRepo.save(
       this.userRepo.create({
         password: hashPassword,
@@ -78,10 +78,12 @@ export class UserService {
       }),
     );
 
+    console.log('user ', user);
     const role = await this.roleService.findOneAndThrowNotFound(
       { code: configService.getValue('USER_ROLE_CODE') },
       true,
     );
+    console.log('role ', role);
     user.role = role;
 
     return this.userRepo.save(user);

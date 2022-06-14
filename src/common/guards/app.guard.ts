@@ -1,4 +1,4 @@
-import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { STRATEGY } from 'common/constants/strategy-name';
@@ -8,7 +8,7 @@ import { RouteService } from 'route/route.service';
 @Injectable()
 export class AppGuard extends AuthGuard(STRATEGY.at) {
   constructor(
-    @Inject(RouteService) private routeService: RouteService,
+    private routeService: RouteService,
     private reflector: Reflector,
   ) {
     super(reflector);
@@ -19,10 +19,9 @@ export class AppGuard extends AuthGuard(STRATEGY.at) {
       context.getHandler(),
       context.getClass(),
     ]);
+    if (isPublic) return true;
 
     const request: Request = context.switchToHttp().getRequest();
-
-    if (isPublic) return true;
 
     const isAuthen = await super.canActivate(context);
     if (!isAuthen) {

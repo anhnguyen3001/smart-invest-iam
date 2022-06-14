@@ -19,21 +19,25 @@ export enum LoginMethodEnum {
 
 @Entity('users')
 export class User extends BaseEntity {
+  @Expose()
+  @ApiProperty({
+    type: 'number',
+  })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Expose()
   @ApiProperty({
     type: 'string',
   })
-  @Expose()
+  @Column({ length: 255 })
   email: string;
 
-  @Column({ length: 255 })
+  @Expose()
   @ApiProperty({
     type: 'string',
   })
-  @Expose()
+  @Column({ length: 255 })
   username: string;
 
   @Column({ length: 255, nullable: true })
@@ -42,21 +46,21 @@ export class User extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isVerified?: boolean;
 
-  @Column({ length: 255, nullable: true })
+  @Expose()
   @ApiProperty({
     type: 'string',
   })
-  @Expose()
+  @Column({ length: 255, nullable: true })
   avatar?: string;
 
   @Column({ length: 255, nullable: true })
   refreshToken?: string;
 
-  @Column({ enum: LoginMethodEnum, default: LoginMethodEnum.local })
+  @Expose()
   @ApiProperty({
     enum: LoginMethodEnum,
   })
-  @Expose()
+  @Column({ enum: LoginMethodEnum, default: LoginMethodEnum.local })
   method?: LoginMethodEnum;
 
   @OneToMany(() => Otp, (otp) => otp.user)

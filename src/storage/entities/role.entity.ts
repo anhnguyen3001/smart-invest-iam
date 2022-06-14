@@ -14,25 +14,25 @@ import { User } from './user.entity';
 
 @Entity('roles')
 export class Role extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @Expose()
   @ApiProperty({
     type: 'number',
   })
-  @Expose()
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 255 })
+  @Expose()
   @ApiProperty({
     type: 'string',
   })
-  @Expose()
+  @Column({ length: 255 })
   name: string;
 
-  @Column({ length: 255 })
+  @Expose()
   @ApiProperty({
     type: 'string',
   })
-  @Expose()
+  @Column({ length: 255 })
   code: string;
 
   @ManyToMany(() => Permission, (permission) => permission.roles, {
