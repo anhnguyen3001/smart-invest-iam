@@ -81,6 +81,11 @@ export class SearchUserDto extends QueryCoreDto {
   @IsOptional()
   method?: string;
 
+  @ApiProperty({ type: 'boolean', required: false })
+  @IsBoolean()
+  @IsOptional()
+  isVerified?: boolean;
+
   @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
   @IsArray()
