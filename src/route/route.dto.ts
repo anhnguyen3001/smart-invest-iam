@@ -18,6 +18,11 @@ export class SearchRouteDto extends QueryCoreDto {
   @IsIn(ROUTE_SORT_BY)
   @IsOptional()
   sortBy?: string = 'id';
+
+  @ApiProperty({ type: [Number], required: false })
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  permissionIds?: number[];
 }
 
 export class SearchRoutesResponse extends ResponseWithPagination {

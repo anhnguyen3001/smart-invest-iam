@@ -6,7 +6,6 @@ import { ExistedException } from 'common/exceptions';
 import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
 import { PermissionService } from 'permission/permission.service';
-import { SearchRoleDto } from 'role/role.dto';
 import { Route } from 'storage/entities/route.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import {
@@ -126,10 +125,12 @@ export class RouteService {
   }
 
   getQueryBuilder(
-    dto: QueryBuilderType<SearchRoleDto>,
+    dto: QueryBuilderType<SearchRouteDto>,
   ): SelectQueryBuilder<Route> {
-    const { q, orderBy, sortBy, ...rest } = dto;
-    let queryBuilder = this.routeRepo.createQueryBuilder('route');
+    const { q, orderBy, sortBy, permissionIds, ...rest } = dto;
+    let queryBuilder = this.routeRepo
+      .createQueryBuilder('route')
+      .leftJoinAndSelect('route.permisions', 'permission');
 
     // search option
     if (q) {
@@ -139,6 +140,13 @@ export class RouteService {
             q: `%${q}%`,
           });
         }),
+      );
+    }
+
+    if (permissionIds?.length) {
+      queryBuilder = queryBuilder.andWhere(
+        `permission.id IN (:...permissionIds)`,
+        { permissionIds },
       );
     }
 
