@@ -28,6 +28,7 @@ export class Route extends BaseEntity {
   @Column({ enum: MethodEnum })
   method: MethodEnum;
 
+  @Expose()
   @ManyToOne(() => Permission, (permission) => permission.routes, {
     nullable: true,
   })
