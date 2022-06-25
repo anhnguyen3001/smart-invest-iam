@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNumber,
@@ -55,6 +56,11 @@ export class QueryCoreDto {
   @IsEnum(ORDER_BY)
   @IsOptional()
   orderBy?: ORDER_BY = ORDER_BY.DESC;
+
+  @ApiProperty({ type: 'boolean', required: false })
+  @IsBoolean()
+  @IsOptional()
+  getAll?: boolean;
 }
 
 export class UpsertQueryDto {

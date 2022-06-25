@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException, NotFoundException } from 'common/exceptions';
+import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
 import { configService } from 'config/config.service';
 import { RoleService } from 'role/role.service';
@@ -33,9 +34,9 @@ export class UserService {
   ) {}
 
   async getListUsers(dto: SearchUserDto): Promise<SearchUsersResponse> {
-    const { page = 1, pageSize = 10 } = dto;
+    const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
-    const { items, meta } = await paginate(this.getQueryBuilder(dto), {
+    const { items, meta } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
     });
@@ -201,8 +202,10 @@ export class UserService {
     return await bcrypt.hash(password, salt);
   }
 
-  getQueryBuilder(dto: SearchUserDto): SelectQueryBuilder<User> {
-    const { page, pageSize, q, userIds, orderBy, sortBy, ...rest } = dto;
+  getQueryBuilder(
+    dto: QueryBuilderType<SearchUserDto>,
+  ): SelectQueryBuilder<User> {
+    const { q, userIds, orderBy, sortBy, ...rest } = dto;
     let queryBuilder = this.userRepo
       .createQueryBuilder('user')
       .leftJoin('user.role', 'role');

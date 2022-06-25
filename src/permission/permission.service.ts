@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException } from 'common/exceptions';
+import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
 import { Permission } from 'storage/entities/permission.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
@@ -22,7 +23,18 @@ export class PermissionService {
   async getListPermissions(
     dto: SearchPermissionDto,
   ): Promise<SearchPermissionsResponse> {
-    const { page = 1, pageSize = 10 } = dto;
+    const { page = 1, pageSize = 10, getAll } = dto;
+
+    if (getAll) {
+      const data = await this.getQueryBuilder(dto).getMany();
+      return {
+        permissions: data,
+        pagination: {
+          totalItems: data.length,
+          totalPages: 1,
+        },
+      };
+    }
 
     const {
       items,
@@ -82,8 +94,10 @@ export class PermissionService {
     return permission;
   }
 
-  getQueryBuilder(dto: SearchPermissionDto): SelectQueryBuilder<Permission> {
-    const { page, pageSize, q, orderBy, sortBy, ...rest } = dto;
+  getQueryBuilder(
+    dto: QueryBuilderType<SearchPermissionDto>,
+  ): SelectQueryBuilder<Permission> {
+    const { q, orderBy, sortBy, ...rest } = dto;
     let queryBuilder = this.permissionRepo.createQueryBuilder('permission');
 
     // search option

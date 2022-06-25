@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AccessDeniedException } from 'auth/auth.exception';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException } from 'common/exceptions';
+import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
 import { PermissionService } from 'permission/permission.service';
 import { SearchRoleDto } from 'role/role.dto';
@@ -23,9 +24,9 @@ export class RouteService {
   ) {}
 
   async getListRoutes(dto: SearchRouteDto): Promise<SearchRoutesResponse> {
-    const { page = 1, pageSize = 10 } = dto;
+    const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
-    const { items, meta } = await paginate(this.getQueryBuilder(dto), {
+    const { items, meta } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
     });
@@ -124,8 +125,10 @@ export class RouteService {
     return route;
   }
 
-  getQueryBuilder(dto: SearchRoleDto): SelectQueryBuilder<Route> {
-    const { page, pageSize, q, orderBy, sortBy, ...rest } = dto;
+  getQueryBuilder(
+    dto: QueryBuilderType<SearchRoleDto>,
+  ): SelectQueryBuilder<Route> {
+    const { q, orderBy, sortBy, ...rest } = dto;
     let queryBuilder = this.routeRepo.createQueryBuilder('route');
 
     // search option

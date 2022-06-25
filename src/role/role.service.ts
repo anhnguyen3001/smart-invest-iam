@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException, NotFoundException } from 'common/exceptions';
+import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
 import { PermissionService } from 'permission/permission.service';
 import { Role } from 'storage/entities/role.entity';
@@ -21,9 +22,20 @@ export class RoleService {
   ) {}
 
   async getListRoles(dto: SearchRoleDto): Promise<SearchRolesResponse> {
-    const { page = 1, pageSize = 10 } = dto;
+    const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
-    const { items, meta } = await paginate(this.getQueryBuilder(dto), {
+    if (getAll) {
+      const data = await this.getQueryBuilder(rest).getMany();
+      return {
+        roles: data,
+        pagination: {
+          totalItems: data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
+    const { items, meta } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
     });
@@ -83,8 +95,10 @@ export class RoleService {
     return role;
   }
 
-  getQueryBuilder(dto: SearchRoleDto): SelectQueryBuilder<Role> {
-    const { page, pageSize, q, orderBy, sortBy, ...rest } = dto;
+  getQueryBuilder(
+    dto: QueryBuilderType<SearchRoleDto>,
+  ): SelectQueryBuilder<Role> {
+    const { q, orderBy, sortBy, ...rest } = dto;
     let queryBuilder = this.roleRepo.createQueryBuilder('role');
 
     // search option
