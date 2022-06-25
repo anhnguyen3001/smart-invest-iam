@@ -91,9 +91,13 @@ export class RoleService {
     if (q) {
       queryBuilder = queryBuilder.andWhere(
         new Brackets((qb) => {
-          qb.where('role.id = :id', { id: q }).orWhere('role.name LIKE :q', {
-            q: `%${q}%`,
-          });
+          qb.where('role.id = :id', { id: q })
+            .orWhere('role.name LIKE :q', {
+              q: `%${q}%`,
+            })
+            .orWhere('role.code LIKE :q', {
+              q: `%${q}%`,
+            });
         }),
       );
     }

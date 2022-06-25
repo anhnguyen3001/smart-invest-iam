@@ -40,6 +40,7 @@ export class User extends BaseEntity {
   @Column({ length: 255 })
   username: string;
 
+  @Expose()
   @Column({ length: 255, nullable: true })
   password?: string;
 
@@ -67,6 +68,7 @@ export class User extends BaseEntity {
   @OneToMany(() => Otp, (otp) => otp.user)
   otps: Otp[];
 
+  @Expose()
   @ManyToOne(() => Role, (role) => role.users, {
     nullable: true,
   })

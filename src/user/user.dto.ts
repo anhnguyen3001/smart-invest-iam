@@ -129,7 +129,7 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(
-  PickType(CreateUserDto, ['username', 'password']),
+  PickType(CreateUserDto, ['username', 'password', 'isVerified']),
 ) {
   @ApiProperty({ type: 'string', required: false })
   @IsString()

@@ -90,12 +90,13 @@ export class PermissionService {
     if (q) {
       queryBuilder = queryBuilder.andWhere(
         new Brackets((qb) => {
-          qb.where('permission.id = :id', { id: q }).orWhere(
-            'permission.name LIKE :q',
-            {
+          qb.where('permission.id = :id', { id: q })
+            .orWhere('permission.name LIKE :q', {
               q: `%${q}%`,
-            },
-          );
+            })
+            .orWhere('permission.code LIKE :q', {
+              q: `%${q}%`,
+            });
         }),
       );
     }
