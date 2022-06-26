@@ -21,7 +21,12 @@ export class Route extends BaseEntity {
   @Expose()
   @ApiProperty({ type: 'string' })
   @Column({ length: 255 })
-  route: string;
+  name: string;
+
+  @Expose()
+  @ApiProperty({ type: 'string' })
+  @Column({ type: 'string' })
+  regUri: string;
 
   @Expose()
   @ApiProperty({ enum: MethodEnum })

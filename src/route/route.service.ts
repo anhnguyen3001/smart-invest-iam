@@ -41,7 +41,7 @@ export class RouteService {
 
   async createRoute(data: CreateRouteDto): Promise<Route> {
     const route = await this.routeRepo.findOne({
-      route: data.route,
+      name: data.name,
       method: data.method,
     });
     if (route) {
@@ -86,9 +86,11 @@ export class RouteService {
     path: string,
     method: string,
   ): Promise<boolean> {
-    const restrictedRoute = await this.routeRepo.findOne({
-      where: { route: path, method },
-    });
+    const restrictedRoute = await this.routeRepo
+      .createQueryBuilder('route')
+      .where(`:path RLIKE route.reg_uri`, { path })
+      .andWhere(`route.method = :method`, { method })
+      .getOne();
     if (!restrictedRoute) {
       return true;
     }
@@ -104,7 +106,7 @@ export class RouteService {
         'ur.role_id = role.id AND ur.user_id = :userId',
         { userId },
       )
-      .where('route.route = :path', { path })
+      .where(`:path RLIKE route.reg_uri`, { path })
       .andWhere('route.method = :method', { method })
       .getOne();
 
