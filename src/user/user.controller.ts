@@ -11,7 +11,6 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiNoContentResponse,
   ApiOperation,
   ApiResponse,
@@ -37,7 +36,6 @@ import {
 } from './user.dto';
 import { UserService } from './user.service';
 
-@ApiBearerAuth()
 @ApiTags('User')
 @Controller({
   path: 'users',

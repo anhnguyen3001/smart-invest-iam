@@ -8,12 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
 import { ApiUpsert } from 'common/decorators/request.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
@@ -30,7 +25,6 @@ import {
 } from './role.dto';
 import { RoleService } from './role.service';
 
-@ApiBearerAuth()
 @ApiTags('Role')
 @Controller({
   path: 'roles',

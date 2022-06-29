@@ -9,7 +9,6 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -32,7 +31,6 @@ import {
 } from './route.dto';
 import { RouteService } from './route.service';
 
-@ApiBearerAuth()
 @ApiTags('Route')
 @Controller({
   path: 'routes',
