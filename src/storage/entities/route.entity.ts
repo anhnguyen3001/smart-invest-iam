@@ -9,6 +9,7 @@ export enum MethodEnum {
   post = 'POST',
   put = 'PUT',
   delete = 'DELETE',
+  patch = 'PATCH',
 }
 
 @Entity('routes')
@@ -25,7 +26,7 @@ export class Route extends BaseEntity {
 
   @Expose()
   @ApiProperty({ type: 'string' })
-  @Column({ type: 'string' })
+  @Column({ length: 255 })
   regUri: string;
 
   @Expose()

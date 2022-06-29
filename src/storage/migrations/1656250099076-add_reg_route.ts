@@ -8,12 +8,18 @@ export class addRegRoute1656250099076 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE routes CHANGE route name VARCHAR(255) NOT NULL;`,
     );
+    await queryRunner.query(
+      `ALTER TABLE routes CHANGE method method ENUM('GET','POST','PUT','PATCH','DELETE') NOT NULL;`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`ALTER TABLE routes DROP COLUMN reg_uri;`);
     await queryRunner.query(
       `ALTER TABLE routes CHANGE name route VARCHAR(255) NOT NULL;`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE routes CHANGE method method ENUM('GET','POST','PUT','DELETE') NOT NULL;`,
     );
   }
 }

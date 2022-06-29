@@ -12,7 +12,7 @@ import {
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { MethodEnum, Route } from 'storage/entities/route.entity';
 
-const ROUTE_SORT_BY = BASE_SORT_BY;
+const ROUTE_SORT_BY = [...BASE_SORT_BY, 'name'];
 export class SearchRouteDto extends QueryCoreDto {
   @ApiProperty({ enum: ROUTE_SORT_BY, default: 'id', required: false })
   @IsIn(ROUTE_SORT_BY)
