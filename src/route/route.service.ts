@@ -10,6 +10,7 @@ import { Route } from 'storage/entities/route.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import {
   CreateRouteDto,
+  RouteAccessQueryDto,
   SearchRouteDto,
   SearchRoutesResponse,
   UpdateRouteDto,
@@ -81,11 +82,9 @@ export class RouteService {
     await this.routeRepo.softRemove(route);
   }
 
-  async checkRoutePermission(
-    userId: number,
-    path: string,
-    method: string,
-  ): Promise<boolean> {
+  async validateRoutePermission(query: RouteAccessQueryDto): Promise<boolean> {
+    const { path, method, userId } = query;
+
     const restrictedRoute = await this.routeRepo
       .createQueryBuilder('route')
       .where(`:path RLIKE route.reg_uri`, { path })

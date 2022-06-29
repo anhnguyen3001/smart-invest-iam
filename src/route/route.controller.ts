@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -24,6 +25,7 @@ import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
 import {
   CreateRouteDto,
+  RouteAccessQueryDto,
   SearchRouteDto,
   SearchRoutesResponse,
   UpdateRouteDto,
@@ -118,5 +120,16 @@ export class RouteController {
   })
   async deleteRoute(@Param() params: RequestParamId): Promise<void> {
     await this.routeService.deleteRoute(params.id);
+  }
+
+  @Get('/access')
+  @ApiOperation({
+    summary: 'Check user has authorization to access this route',
+  })
+  @ApiOkResponse({
+    description: "Validate user's authorization to access route",
+  })
+  async validatePermission(@Query() query: RouteAccessQueryDto) {
+    await this.routeService.validateRoutePermission(query);
   }
 }

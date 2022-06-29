@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { MethodEnum, Route } from 'storage/entities/route.entity';
+import { User } from 'storage/entities/user.entity';
 
 const ROUTE_SORT_BY = [...BASE_SORT_BY, 'name'];
 export class SearchRouteDto extends QueryCoreDto {
@@ -50,3 +51,23 @@ export class CreateRouteDto {
 }
 
 export class UpdateRouteDto extends PartialType(CreateRouteDto) {}
+
+export class RouteAccessQueryDto {
+  @ApiProperty({ type: 'number' })
+  @IsNumber()
+  userId: number;
+
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  path: string;
+
+  @ApiProperty({ enum: MethodEnum })
+  @IsEnum(MethodEnum)
+  method: MethodEnum;
+}
+
+export class RouteAccessResponse {
+  @Expose()
+  @ApiResponseProperty({ type: User })
+  user: User;
+}

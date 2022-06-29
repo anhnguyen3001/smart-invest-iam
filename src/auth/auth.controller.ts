@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'common/decorators/public.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
 import { GetUser, GetUserId } from 'common/decorators/user.decorator';
 import { RtGuard } from 'common/guards/rt.guard';
@@ -46,7 +45,6 @@ import { FBAuthGuard, GoogleAuthGuard } from './guards';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
   @Post('login')
   @HttpCode(200)
   @ApiOperation({
@@ -60,7 +58,6 @@ export class AuthController {
     return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
-  @Public()
   @UseGuards(FBAuthGuard)
   @Get('facebook')
   @ApiOperation({
@@ -77,7 +74,6 @@ export class AuthController {
     return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
-  @Public()
   @UseGuards(GoogleAuthGuard)
   @Get('google')
   @ApiOperation({
@@ -99,7 +95,6 @@ export class AuthController {
     await this.authService.logout(id);
   }
 
-  @Public()
   @Post('signup')
   @ApiOperation({
     summary: 'Sign up',
@@ -112,7 +107,6 @@ export class AuthController {
     await this.authService.signup(dto);
   }
 
-  @Public()
   @Get('verify')
   @ApiOperation({
     summary: 'Verify account',
@@ -124,7 +118,6 @@ export class AuthController {
     await this.authService.verifyUser(query);
   }
 
-  @Public()
   @Get('recover/init')
   @ApiOperation({
     summary: 'Forget password',
@@ -136,7 +129,6 @@ export class AuthController {
     await this.authService.forgetPassword(query);
   }
 
-  @Public()
   @Get('recover/code')
   @ApiOperation({
     summary: 'Verify otp for reset password',
@@ -151,7 +143,6 @@ export class AuthController {
     return getBaseResponse({ data: { token } }, OtpTokenResult);
   }
 
-  @Public()
   @Post('recover/password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -166,7 +157,6 @@ export class AuthController {
     await this.authService.recoverPassword(dto, token);
   }
 
-  @Public()
   @Get('resend')
   @ApiOperation({
     summary: 'Resend OTP',
