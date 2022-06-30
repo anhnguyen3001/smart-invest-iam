@@ -17,6 +17,8 @@ import {
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { Role } from 'storage/entities/role.entity';
 
+export class NestedRoleDto extends PickType(Role, ['id', 'name', 'code']) {}
+
 const ROLE_SORT_BY = BASE_SORT_BY;
 export class SearchRoleDto extends QueryCoreDto {
   @ApiProperty({ enum: ROLE_SORT_BY, default: 'id', required: false })

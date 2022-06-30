@@ -16,10 +16,11 @@ import {
 } from 'typeorm';
 import {
   ChangePasswordDto,
+  CreateUserDto,
   SearchUserDto,
   SearchUsersResponse,
-  CreateUserDto,
   UpdateUserDto,
+  UserDto,
 } from './user.dto';
 import {
   LackPasswordException,
@@ -69,7 +70,7 @@ export class UserService {
 
       hashPassword = await this.hashPassword(password);
     }
-    console.log('rest');
+
     const user = await this.userRepo.save(
       this.userRepo.create({
         password: hashPassword,
@@ -79,12 +80,10 @@ export class UserService {
       }),
     );
 
-    console.log('user ', user);
     const role = await this.roleService.findOneAndThrowNotFound(
       { code: configService.getValue('USER_ROLE_CODE') },
       true,
     );
-    console.log('role ', role);
     user.role = role;
 
     return this.userRepo.save(user);
@@ -171,6 +170,23 @@ export class UserService {
     if (throwNotFound && !user) {
       throw new NotFoundException(EntityEnum.user);
     }
+    return user;
+  }
+
+  async getUserInfo(id: number): Promise<UserDto> {
+    const user = (await this.userRepo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoin('role_permission', 'rp', 'rp.role_id =  role.id')
+      .leftJoinAndMapMany(
+        'user.permissions',
+        'permissions',
+        'permission',
+        'permission.id = rp.permission_id',
+      )
+      .addSelect(['permission.id'])
+      .where('user.id = :id', { id })
+      .getOne()) as any;
     return user;
   }
 

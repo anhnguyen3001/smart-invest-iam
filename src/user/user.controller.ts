@@ -130,10 +130,8 @@ export class UserController {
   @ApiOkBaseResponse(UserResponseDto, {
     description: 'Get user info successfully',
   })
-  async getUserInfo(
-    @GetUserId() id: number,
-  ): Promise<BaseResponse<UserResponseDto>> {
-    const user = await this.userService.findOneById(id);
+  async getUserInfo(): Promise<BaseResponse<UserResponseDto>> {
+    const user = await this.userService.getUserInfo(3);
     return getBaseResponse(
       {
         data: { user },

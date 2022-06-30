@@ -40,7 +40,6 @@ export class User extends BaseEntity {
   @Column({ length: 255 })
   username: string;
 
-  @Expose()
   @Column({ length: 255, nullable: true })
   password?: string;
 
