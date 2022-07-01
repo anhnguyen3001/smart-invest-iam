@@ -33,7 +33,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/users')
+  @Get()
   @ApiOperation({
     summary: 'Get users by queries',
   })
@@ -52,7 +52,7 @@ export class UserController {
     );
   }
 
-  @Post('/users')
+  @Post()
   @HttpCode(200)
   @ApiOperation({
     summary: 'Upsert user',
@@ -98,7 +98,7 @@ export class UserController {
     );
   }
 
-  @Delete('/users/:id')
+  @Delete('/:id')
   @HttpCode(204)
   @ApiOperation({
     summary: 'Delete user by id',
