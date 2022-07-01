@@ -1,6 +1,8 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEnum,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -67,6 +69,13 @@ export class SignupDto {
   @MinLength(1)
   @IsString()
   username: string;
+
+  @ApiProperty({ type: 'boolean' })
+  @MaxLength(255)
+  @MinLength(1)
+  @IsBoolean()
+  @IsOptional()
+  sendVerifiedEmail?: boolean = true;
 
   validate() {
     if (this.password !== this.confirmPassword) {
