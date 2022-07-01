@@ -141,6 +141,7 @@ export class CreateUserDto {
   @ApiProperty({ type: 'string', required: false })
   @IsString()
   @Matches(PATTERN_VALIDATION.password)
+  @IsOptional()
   password?: string;
 
   @ApiProperty({ enum: LoginMethodEnum, required: false })
