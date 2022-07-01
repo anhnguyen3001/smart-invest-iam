@@ -38,13 +38,12 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller({
-  path: 'users',
   version: configService.getValue('API_VERSION'),
 })
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
+  @Get('/users')
   @ApiOperation({
     summary: 'Get users by queries',
   })
@@ -63,7 +62,7 @@ export class UserController {
     );
   }
 
-  @Post()
+  @Post('/users')
   @HttpCode(200)
   @ApiOperation({
     summary: 'Upsert user',
@@ -109,7 +108,7 @@ export class UserController {
     );
   }
 
-  @Delete('/:id')
+  @Delete('/users/:id')
   @HttpCode(204)
   @ApiOperation({
     summary: 'Delete user by id',
@@ -122,7 +121,6 @@ export class UserController {
     await this.userService.deleteUser(params.id);
   }
 
-  // TODO: BFF
   @Get('me')
   @ApiOperation({
     summary: 'Get user info',
