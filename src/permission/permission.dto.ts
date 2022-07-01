@@ -15,12 +15,6 @@ import {
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { Permission } from 'storage/entities/permission.entity';
 
-export class NestedPermissionDto extends PickType(Permission, [
-  'id',
-  'name',
-  'code',
-]) {}
-
 const PERMISSION_SORT_BY = BASE_SORT_BY;
 export class SearchPermissionDto extends QueryCoreDto {
   @ApiProperty({ enum: PERMISSION_SORT_BY, default: 'id', required: false })

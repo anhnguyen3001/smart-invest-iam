@@ -21,8 +21,8 @@ import {
 } from 'class-validator';
 import { PATTERN_VALIDATION } from 'common/constants/validation';
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { NestedPermissionDto } from 'permission/permission.dto';
-import { NestedRoleDto } from 'role/role.dto';
+import { Permission } from 'storage/entities/permission.entity';
+import { Role } from 'storage/entities/role.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import { PasswordNotMatchException } from './user.exception';
 
@@ -64,7 +64,7 @@ export class UpdateProfileDto {
   avatar?: string;
 }
 
-export class UserDto extends PickType(User, [
+export class DetailUserDto extends PickType(User, [
   'id',
   'avatar',
   'isVerified',
@@ -73,24 +73,22 @@ export class UserDto extends PickType(User, [
 ]) {
   @Expose()
   @ApiProperty({
-    type: NestedRoleDto,
+    type: Role,
   })
-  @Type(() => NestedRoleDto)
-  role: NestedRoleDto;
+  role: Role;
 
   @Expose()
   @ApiProperty({
-    type: [NestedPermissionDto],
+    type: [Permission],
   })
-  @Type(() => NestedPermissionDto)
-  permissions: NestedPermissionDto[];
+  permissions: Permission[];
 }
 
-export class UserResponseDto {
+export class UserProfileResponseDto {
   @Expose()
-  @ApiResponseProperty({ type: UserDto })
-  @Type(() => UserDto)
-  user: UserDto;
+  @ApiResponseProperty({ type: DetailUserDto })
+  @Type(() => DetailUserDto)
+  user: DetailUserDto;
 }
 
 const USER_SORT_BY = BASE_SORT_BY;
@@ -120,7 +118,6 @@ export class SearchUserDto extends QueryCoreDto {
 export class SearchUsersResponse extends ResponseWithPagination {
   @Expose()
   @ApiResponseProperty({ type: [User] })
-  @Type(() => User)
   users: User[];
 }
 

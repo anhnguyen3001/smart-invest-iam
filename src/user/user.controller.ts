@@ -32,7 +32,7 @@ import {
   SearchUsersResponse,
   UpdateProfileDto,
   UpdateUserDto,
-  UserResponseDto,
+  UserProfileResponseDto,
 } from './user.dto';
 import { UserService } from './user.service';
 
@@ -127,16 +127,16 @@ export class UserController {
   @ApiOperation({
     summary: 'Get user info',
   })
-  @ApiOkBaseResponse(UserResponseDto, {
+  @ApiOkBaseResponse(UserProfileResponseDto, {
     description: 'Get user info successfully',
   })
-  async getUserInfo(): Promise<BaseResponse<UserResponseDto>> {
+  async getUserInfo(): Promise<BaseResponse<UserProfileResponseDto>> {
     const user = await this.userService.getUserInfo(3);
     return getBaseResponse(
       {
         data: { user },
       },
-      UserResponseDto,
+      UserProfileResponseDto,
     );
   }
 

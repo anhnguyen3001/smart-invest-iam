@@ -17,10 +17,10 @@ import {
 import {
   ChangePasswordDto,
   CreateUserDto,
+  DetailUserDto,
   SearchUserDto,
   SearchUsersResponse,
   UpdateUserDto,
-  UserDto,
 } from './user.dto';
 import {
   LackPasswordException,
@@ -173,7 +173,7 @@ export class UserService {
     return user;
   }
 
-  async getUserInfo(id: number): Promise<UserDto> {
+  async getUserInfo(id: number): Promise<DetailUserDto> {
     const user = (await this.userRepo
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
@@ -184,7 +184,6 @@ export class UserService {
         'permission',
         'permission.id = rp.permission_id',
       )
-      .addSelect(['permission.id'])
       .where('user.id = :id', { id })
       .getOne()) as any;
     return user;
@@ -224,7 +223,7 @@ export class UserService {
     const { q, userIds, orderBy, sortBy, ...rest } = dto;
     let queryBuilder = this.userRepo
       .createQueryBuilder('user')
-      .leftJoin('user.role', 'role');
+      .leftJoinAndSelect('user.role', 'role');
 
     // search option
     if (q) {
