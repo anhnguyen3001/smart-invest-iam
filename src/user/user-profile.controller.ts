@@ -28,7 +28,7 @@ import { UserService } from './user.service';
 export class UserProfileController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('me')
+  @Get()
   @ApiOperation({
     summary: 'Get user info',
   })
@@ -45,7 +45,7 @@ export class UserProfileController {
     );
   }
 
-  @Patch('me')
+  @Patch()
   @ApiOperation({
     summary: 'Update user profile',
   })
