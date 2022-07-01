@@ -38,6 +38,7 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller({
+  path: [],
   version: configService.getValue('API_VERSION'),
 })
 export class UserController {

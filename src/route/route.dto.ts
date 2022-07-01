@@ -46,6 +46,7 @@ export class CreateRouteDto {
 
   @ApiProperty({ type: Number, required: false })
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   permissionId?: number;
 }
@@ -55,6 +56,7 @@ export class UpdateRouteDto extends PartialType(CreateRouteDto) {}
 export class RouteAccessQueryDto {
   @ApiProperty({ type: 'number' })
   @IsNumber()
+  @Type(() => Number)
   userId: number;
 
   @ApiProperty({ type: 'string' })
