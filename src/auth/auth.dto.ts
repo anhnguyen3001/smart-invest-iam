@@ -71,8 +71,6 @@ export class SignupDto {
   username: string;
 
   @ApiProperty({ type: 'boolean' })
-  @MaxLength(255)
-  @MinLength(1)
   @IsBoolean()
   @IsOptional()
   sendVerifiedEmail?: boolean = true;
