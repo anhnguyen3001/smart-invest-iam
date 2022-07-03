@@ -59,6 +59,7 @@ export class QueryCoreDto {
 
   @ApiProperty({ type: 'boolean', required: false })
   @IsBoolean()
+  @Type(() => Boolean)
   @IsOptional()
   getAll?: boolean;
 }

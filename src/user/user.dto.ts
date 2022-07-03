@@ -105,6 +105,7 @@ export class SearchUserDto extends QueryCoreDto {
 
   @ApiProperty({ type: 'boolean', required: false })
   @IsBoolean()
+  @Type(() => Boolean)
   @IsOptional()
   isVerified?: boolean;
 
