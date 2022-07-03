@@ -118,12 +118,12 @@ export class PermissionService {
     // boolean option + string option
     Object.entries(rest).forEach(([k, v]) => {
       if (typeof v === 'boolean' || typeof v === 'string')
-        queryBuilder = queryBuilder.andWhere(`perrmission.${k} = :${k}`, {
+        queryBuilder = queryBuilder.andWhere(`permission.${k} = :${k}`, {
           [k]: v,
         });
     });
 
-    queryBuilder = queryBuilder.addOrderBy(`perrmission.${sortBy}`, orderBy);
+    queryBuilder = queryBuilder.addOrderBy(`permission.${sortBy}`, orderBy);
 
     return queryBuilder;
   }

@@ -131,7 +131,7 @@ export class RouteService {
     const { q, orderBy, sortBy, permissionIds, ...rest } = dto;
     let queryBuilder = this.routeRepo
       .createQueryBuilder('route')
-      .leftJoinAndSelect('route.permisions', 'permission');
+      .leftJoinAndSelect('route.permision', 'permission');
 
     // search option
     if (q) {
