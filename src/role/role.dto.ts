@@ -44,14 +44,14 @@ export class CreateRoleDto {
   @MinLength(1)
   @MaxLength(255)
   code: string;
-}
 
-export class UpdateRoleDto extends PartialType(
-  PickType(CreateRoleDto, ['name']),
-) {
   @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
   @IsArray()
   @IsOptional()
   permissionIds?: number[];
 }
+
+export class UpdateRoleDto extends PartialType(
+  PickType(CreateRoleDto, ['name', 'permissionIds']),
+) {}
