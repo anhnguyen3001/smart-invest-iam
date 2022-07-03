@@ -23,10 +23,10 @@ export class PermissionService {
   async getListPermissions(
     dto: SearchPermissionDto,
   ): Promise<SearchPermissionsResponse> {
-    const { page = 1, pageSize = 10, getAll } = dto;
+    const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
     if (getAll) {
-      const data = await this.getQueryBuilder(dto).getMany();
+      const data = await this.getQueryBuilder(rest).getMany();
       return {
         permissions: data,
         pagination: {
@@ -39,7 +39,7 @@ export class PermissionService {
     const {
       items,
       meta: { totalItems, totalPages },
-    } = await paginate(this.getQueryBuilder(dto), {
+    } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
     });
