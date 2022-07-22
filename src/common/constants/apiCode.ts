@@ -72,24 +72,16 @@ export const ApiCode = {
       code: '1006',
       description: 'Lack of password to create account',
     },
-    RECENTLY_SEND_MAIL: {
-      code: '1007',
-      description: 'Mail have recently been sent',
-    },
     RECENTLY_SENT_OTP: {
       code: '1007',
       description: 'OTP has recently been sent',
     },
-    EXPIRED_OTP: {
-      code: '1007',
-      description: 'OTP has been expired',
-    },
     INVALID_OTP: {
-      code: '1007',
+      code: '1008',
       description: 'Invalid OTP',
     },
     UNVERIFIED_USER: {
-      code: '1006',
+      code: '1009',
       description: 'Your email had not been verified',
     },
 

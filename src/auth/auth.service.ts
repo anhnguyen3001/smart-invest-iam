@@ -1,32 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { EntityEnum } from 'common/constants/apiCode';
+import { ExistedException, NotFoundException } from 'common/exceptions';
 import { OtpService } from 'otp/otp.service';
+import { RoleService } from 'role/role.service';
 import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
-import { UpdatePasswordDto } from 'user/user.dto';
 import { MailService } from '../external/mail/mail.service';
 import { UserService } from '../user/user.service';
 import {
-  AccessDeniedException,
-  InvalidCredentialException,
-  InvalidTokenException,
-  UnverifiedUserException,
-  VerifiedUserException,
-} from './auth.exception';
-import { JWT_SECRET_KEY } from './constants';
-import {
   ForgetPasswordDto,
   LoginDto,
+  RecoverPasswordDto,
   ResendOtpQueryDto,
   SignupDto,
   TokenResult,
   VerifyOtpQueryDto,
 } from './auth.dto';
-import { IJWTPayload, ILoginSocialInfo } from './interfaces';
-import { ExistedException, NotFoundException } from 'common/exceptions';
-import { EntityEnum } from 'common/constants/apiCode';
-import { RoleService } from 'role/role.service';
+import {
+  AccessDeniedException,
+  InvalidCredentialException,
+  UnverifiedUserException,
+  VerifiedUserException,
+} from './auth.exception';
+import { JWT_SECRET_KEY } from './constants';
+import { ILoginSocialInfo } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -72,7 +71,7 @@ export class AuthService {
     const user = await this.userService.createUser(restDto);
 
     if (sendVerifiedEmail) {
-      this.sendVerifyUserMail(user);
+      await this.sendVerifyUserMail(user);
     }
 
     return user;
@@ -81,24 +80,14 @@ export class AuthService {
   async verifyUser(query: VerifyOtpQueryDto): Promise<void> {
     const { email, code } = query;
 
-    const user = await this.userService.findUnverifiedUserByEmail(email, true);
-    if (!user) {
-      throw new NotFoundException(EntityEnum.user);
-    }
+    const user = await this.userService.findOneAndThrowNotFound({ email });
     if (user.isVerified) {
       throw new VerifiedUserException();
     }
 
-    const otp = await this.otpService.verifyOtp(
-      user.id,
-      code,
-      OtpTypeEnum.verifyUser,
-    );
+    await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.verifyUser);
 
-    await Promise.all([
-      this.otpService.deleteOtp(otp.id),
-      this.userService.updateById(user.id, { isVerified: true }),
-    ]);
+    await this.userService.updateById(user.id, { isVerified: true });
   }
 
   async forgetPassword(data: ForgetPasswordDto): Promise<void> {
@@ -109,45 +98,19 @@ export class AuthService {
       throw new NotFoundException(EntityEnum.user);
     }
 
-    this.sendForgetPasswordMail(user);
+    await this.sendForgetPasswordMail(user);
   }
 
-  async verifyOtpResetPassword(query: VerifyOtpQueryDto): Promise<string> {
-    const { email, code } = query;
-
-    const user = await this.userService.findVerifiedUserByEmail(email, true);
-    if (!user) {
-      throw new NotFoundException(EntityEnum.user);
-    }
-
-    await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.resetPassword);
-
-    return this.jwtService.sign(
-      {
-        sub: user.id,
-        email,
-      },
-      {
-        expiresIn: '10m',
-        secret: JWT_SECRET_KEY.resetPass,
-      },
-    );
-  }
-
-  async recoverPassword(data: UpdatePasswordDto, token: string): Promise<void> {
+  async recoverPassword(data: RecoverPasswordDto): Promise<void> {
     data.validate();
 
-    const { newPassword: password } = data;
-    let id;
+    const { newPassword: password, code, email } = data;
+    const { id } = await this.userService.findOneAndThrowNotFound(
+      { email, isVerified: true, method: LoginMethodEnum.local },
+      true,
+    );
 
-    try {
-      const jwtPayload: IJWTPayload = await this.jwtService.verify(token, {
-        secret: JWT_SECRET_KEY.resetPass,
-      });
-      id = jwtPayload.sub;
-    } catch (e) {
-      throw new InvalidTokenException();
-    }
+    await this.otpService.verifyOtp(id, code, OtpTypeEnum.resetPassword);
 
     await this.userService.updateById(id, { password });
   }
@@ -155,26 +118,23 @@ export class AuthService {
   async resendOtp(data: ResendOtpQueryDto): Promise<void> {
     const { type, email } = data;
 
-    const user = await this.userService.findOne({
+    const user = await this.userService.findOneAndThrowNotFound({
       email,
       method: LoginMethodEnum.local,
     });
-    if (!user) {
-      throw new NotFoundException(EntityEnum.user);
-    }
 
     if (type === OtpTypeEnum.verifyUser) {
       if (user.isVerified) {
         throw new VerifiedUserException();
       }
 
-      this.sendVerifyUserMail(user);
+      await this.sendVerifyUserMail(user);
     } else {
       if (!user.isVerified) {
         throw new UnverifiedUserException();
       }
 
-      this.sendForgetPasswordMail(user);
+      await this.sendForgetPasswordMail(user);
     }
   }
 

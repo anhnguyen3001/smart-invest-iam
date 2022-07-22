@@ -5,7 +5,6 @@ import { Otp, OtpTypeEnum } from 'storage/entities/otp.entity';
 import { User } from 'storage/entities/user.entity';
 import { MoreThan, Repository } from 'typeorm';
 import {
-  ExpiredOtpException,
   InvalidCodeException,
   RecentlySentOtpException,
 } from './otp.exception';
@@ -65,7 +64,7 @@ export class OtpService {
       take: 1,
     });
     if (!otps.length) {
-      throw new ExpiredOtpException();
+      throw new InvalidCodeException();
     }
 
     const { secret } = otps[0];
@@ -80,9 +79,5 @@ export class OtpService {
     }
 
     return otps[0];
-  }
-
-  async deleteOtp(id: number): Promise<void> {
-    await this.otpRepo.softDelete({ id });
   }
 }

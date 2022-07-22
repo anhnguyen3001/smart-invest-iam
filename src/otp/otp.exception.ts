@@ -12,16 +12,6 @@ export class RecentlySentOtpException extends APIException {
   }
 }
 
-export class ExpiredOtpException extends APIException {
-  constructor() {
-    super(
-      ApiCode[400].EXPIRED_OTP.code,
-      HttpStatus.BAD_REQUEST,
-      ApiCode[400].EXPIRED_OTP.description,
-    );
-  }
-}
-
 export class InvalidCodeException extends APIException {
   constructor() {
     super(

@@ -136,19 +136,6 @@ export class UserService {
     await this.updateById(id, { password: newPassword });
   }
 
-  async findUnverifiedUserByEmail(
-    email: string,
-    isLocalLogin = false,
-  ): Promise<User> {
-    return this.userRepo.findOne({
-      email,
-      isVerified: false,
-      ...(isLocalLogin && {
-        method: LoginMethodEnum.local,
-      }),
-    });
-  }
-
   async findVerifiedUserByEmail(
     email: string,
     isLocalLogin = false,

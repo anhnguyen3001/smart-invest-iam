@@ -116,3 +116,28 @@ export class ResendOtpQueryDto {
   @IsString()
   email: string;
 }
+
+export class RecoverPasswordDto {
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  @Matches(PATTERN_VALIDATION.email)
+  email: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  code: string;
+
+  @ApiProperty({ type: 'string' })
+  @Matches(PATTERN_VALIDATION.password)
+  newPassword: string;
+
+  @ApiProperty({ type: 'string' })
+  @Matches(PATTERN_VALIDATION.password)
+  confirmPassword: string;
+
+  validate() {
+    if (this.newPassword !== this.confirmPassword) {
+      throw new PasswordNotMatchException();
+    }
+  }
+}

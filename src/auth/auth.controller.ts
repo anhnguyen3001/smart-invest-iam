@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -21,14 +20,12 @@ import { RtGuard } from 'common/guards/rt.guard';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
-import { Request } from 'express';
 import { User } from 'storage/entities/user.entity';
-import { UpdatePasswordDto } from 'user/user.dto';
 import {
   ForgetPasswordDto,
   LoginDto,
   LoginSocialDto,
-  OtpTokenResult,
+  RecoverPasswordDto,
   ResendOtpQueryDto,
   SignupDto,
   TokenResult,
@@ -129,32 +126,14 @@ export class AuthController {
     await this.authService.forgetPassword(query);
   }
 
-  @Get('recover/code')
-  @ApiOperation({
-    summary: 'Verify otp for reset password',
-  })
-  @ApiOkBaseResponse(OtpTokenResult, {
-    description: 'Verify OTP successfully',
-  })
-  async recoverCode(
-    @Query() query: VerifyOtpQueryDto,
-  ): Promise<BaseResponse<OtpTokenResult>> {
-    const token = await this.authService.verifyOtpResetPassword(query);
-    return getBaseResponse({ data: { token } }, OtpTokenResult);
-  }
-
   @Post('recover/password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Reset password',
   })
   @ApiOkResponse({ description: 'Reset password successfully' })
-  async recoverPassword(
-    @Req() req: Request,
-    @Body() dto: UpdatePasswordDto,
-  ): Promise<void> {
-    const token = req.headers.authorization;
-    await this.authService.recoverPassword(dto, token);
+  async recoverPassword(@Body() dto: RecoverPasswordDto): Promise<void> {
+    await this.authService.recoverPassword(dto);
   }
 
   @Get('resend')
