@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { STRATEGY } from 'common/constants/strategy-name';
+import { STRATEGY } from '../constants';
 import { Observable } from 'rxjs';
 
 @Injectable()

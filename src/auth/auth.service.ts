@@ -7,6 +7,7 @@ import { OtpService } from 'otp/otp.service';
 import { RoleService } from 'role/role.service';
 import { OtpTypeEnum } from 'storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
+import { DetailUserDto } from 'user/user.dto';
 import { MailService } from '../external/mail/mail.service';
 import { UserService } from '../user/user.service';
 import {
@@ -85,9 +86,16 @@ export class AuthService {
       throw new VerifiedUserException();
     }
 
-    await this.otpService.verifyOtp(user.id, code, OtpTypeEnum.verifyUser);
+    const otp = await this.otpService.verifyOtp(
+      user.id,
+      code,
+      OtpTypeEnum.verifyUser,
+    );
 
-    await this.userService.updateById(user.id, { isVerified: true });
+    await Promise.all([
+      this.userService.updateById(user.id, { isVerified: true }),
+      this.otpService.deleteOtp(otp.id),
+    ]);
   }
 
   async forgetPassword(data: ForgetPasswordDto): Promise<void> {
@@ -212,8 +220,8 @@ export class AuthService {
     );
   }
 
-  async validateUser(id: number, email: string): Promise<User> {
-    return this.userService.findOne({ id, email, isVerified: true });
+  async validateUser(id: number, email: string): Promise<DetailUserDto> {
+    return this.userService.getUserInfo(id, email);
   }
 
   async findOrCreateSocialUser(info: ILoginSocialInfo): Promise<User> {

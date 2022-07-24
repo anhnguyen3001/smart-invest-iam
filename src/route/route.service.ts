@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AccessDeniedException } from 'auth/auth.exception';
 import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException } from 'common/exceptions';
 import { QueryBuilderType } from 'common/types/core.type';
@@ -26,6 +25,17 @@ export class RouteService {
   async getListRoutes(dto: SearchRouteDto): Promise<SearchRoutesResponse> {
     const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
+    if (getAll) {
+      const data = await this.getQueryBuilder(rest).getMany();
+      return {
+        routes: data,
+        pagination: {
+          totalItems: data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
     const { items, meta } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
@@ -42,7 +52,7 @@ export class RouteService {
 
   async createRoute(data: CreateRouteDto): Promise<Route> {
     const route = await this.routeRepo.findOne({
-      name: data.name,
+      regUri: data.regUri,
       method: data.method,
     });
     if (route) {
@@ -85,33 +95,31 @@ export class RouteService {
   async validateRoutePermission(query: RouteAccessQueryDto): Promise<boolean> {
     const { path, method, userId } = query;
 
-    const restrictedRoute = await this.routeRepo
+    const queryBuilder = this.routeRepo
       .createQueryBuilder('route')
       .where(`:path RLIKE route.reg_uri`, { path })
-      .andWhere(`route.method = :method`, { method })
-      .getOne();
-    if (!restrictedRoute) {
-      return true;
+      .andWhere(`route.method = :method`, { method });
+
+    const restrictedRoute = await queryBuilder.getOne();
+    if (restrictedRoute) {
+      const route = await queryBuilder
+        .innerJoinAndSelect('route.permission', 'permission')
+        .innerJoin('role_permission', 'rp', 'rp.permission_id =  permission.id')
+        .innerJoin('roles', 'role', 'role.id =  rp.role_id')
+        .innerJoin(
+          'user_role',
+          'ur',
+          'ur.role_id = role.id AND ur.user_id = :userId',
+          { userId },
+        )
+        .getOne();
+
+      if (!route) {
+        return false;
+      }
     }
 
-    const route = await this.routeRepo
-      .createQueryBuilder('route')
-      .innerJoinAndSelect('route.permission', 'permission')
-      .innerJoin('role_permission', 'rp', 'rp.permission_id =  permission.id')
-      .innerJoin('roles', 'role', 'role.id =  rp.role_id')
-      .innerJoin(
-        'user_role',
-        'ur',
-        'ur.role_id = role.id AND ur.user_id = :userId',
-        { userId },
-      )
-      .where(`:path RLIKE route.reg_uri`, { path })
-      .andWhere('route.method = :method', { method })
-      .getOne();
-
-    if (!route) {
-      throw new AccessDeniedException();
-    }
+    return true;
   }
 
   async findOneAndThrowNotFound(

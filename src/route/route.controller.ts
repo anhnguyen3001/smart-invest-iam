@@ -8,12 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiCode } from 'common/constants/apiCode';
 import { ApiUpsert } from 'common/decorators/request.decorator';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
@@ -24,7 +19,6 @@ import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
 import {
   CreateRouteDto,
-  RouteAccessQueryDto,
   SearchRouteDto,
   SearchRoutesResponse,
   UpdateRouteDto,
@@ -118,16 +112,5 @@ export class RouteController {
   })
   async deleteRoute(@Param() params: RequestParamId): Promise<void> {
     await this.routeService.deleteRoute(params.id);
-  }
-
-  @Get('/access')
-  @ApiOperation({
-    summary: 'Check user has authorization to access this route',
-  })
-  @ApiOkResponse({
-    description: "Validate user's authorization to access route",
-  })
-  async validatePermission(@Query() query: RouteAccessQueryDto) {
-    await this.routeService.validateRoutePermission(query);
   }
 }

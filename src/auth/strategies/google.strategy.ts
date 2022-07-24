@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ILoginSocialInfo } from 'auth/interfaces';
-import { STRATEGY } from 'common/constants/strategy-name';
+import { STRATEGY } from '../constants';
 import { configService } from 'config/config.service';
 import { Profile, Strategy } from 'passport-google-token';
 import { LoginMethodEnum } from 'storage/entities/user.entity';

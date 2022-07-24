@@ -6,8 +6,11 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiNoContentResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RtGuard } from 'auth/guards/rt.guard';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
 import { GetUserId } from 'common/decorators/user.decorator';
 import { BaseResponse } from 'common/types/api-response.type';
@@ -28,6 +31,7 @@ import { UserService } from './user.service';
 export class UserProfileController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(RtGuard)
   @Get()
   @ApiOperation({
     summary: 'Get user info',
@@ -35,11 +39,12 @@ export class UserProfileController {
   @ApiOkBaseResponse(UserProfileResponseDto, {
     description: 'Get user info successfully',
   })
-  async getUserInfo(): Promise<BaseResponse<UserProfileResponseDto>> {
-    const user = await this.userService.getUserInfo(3);
+  async getUserInfo(
+    @Request() request,
+  ): Promise<BaseResponse<UserProfileResponseDto>> {
     return getBaseResponse(
       {
-        data: { user },
+        data: { user: request.user },
       },
       UserProfileResponseDto,
     );

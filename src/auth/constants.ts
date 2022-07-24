@@ -5,3 +5,10 @@ export const JWT_SECRET_KEY = {
   rt: configService.getValue('REFRESH_TOKEN_SECRET'),
   resetPass: configService.getValue('RESET_PASS_KEY'),
 };
+
+export const STRATEGY = {
+  at: 'jwt',
+  rt: 'jwt-refresh',
+  facebook: 'facebook-token',
+  google: 'google-token',
+};

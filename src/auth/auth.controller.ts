@@ -16,7 +16,6 @@ import {
 } from '@nestjs/swagger';
 import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
 import { GetUser, GetUserId } from 'common/decorators/user.decorator';
-import { RtGuard } from 'common/guards/rt.guard';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
@@ -32,7 +31,9 @@ import {
   VerifyOtpQueryDto,
 } from './auth.dto';
 import { AuthService } from './auth.service';
-import { FBAuthGuard, GoogleAuthGuard } from './guards';
+import { FBAuthGuard } from './guards/facebook-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { RtGuard } from './guards/rt.guard';
 
 @ApiTags('Auth')
 @Controller({

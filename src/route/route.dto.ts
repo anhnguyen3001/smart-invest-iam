@@ -11,7 +11,6 @@ import {
 } from 'class-validator';
 import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
 import { MethodEnum, Route } from 'storage/entities/route.entity';
-import { User } from 'storage/entities/user.entity';
 
 const ROUTE_SORT_BY = [...BASE_SORT_BY, 'name'];
 export class SearchRouteDto extends QueryCoreDto {
@@ -24,6 +23,16 @@ export class SearchRouteDto extends QueryCoreDto {
   @IsNumber({}, { each: true })
   @IsOptional()
   permissionIds?: number[];
+
+  @ApiProperty({ type: 'string', required: false })
+  @IsString()
+  @IsOptional()
+  path?: string;
+
+  @ApiProperty({ enum: MethodEnum, required: false })
+  @IsEnum(MethodEnum)
+  @IsOptional()
+  method?: MethodEnum;
 }
 
 export class SearchRoutesResponse extends ResponseWithPagination {
@@ -39,6 +48,12 @@ export class CreateRouteDto {
   @MinLength(1)
   @MaxLength(255)
   name: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  regUri: string;
 
   @ApiProperty({ enum: MethodEnum })
   @IsEnum(MethodEnum)
@@ -70,6 +85,6 @@ export class RouteAccessQueryDto {
 
 export class RouteAccessResponse {
   @Expose()
-  @ApiResponseProperty({ type: User })
-  user: User;
+  @ApiResponseProperty({ type: 'boolean' })
+  isAllow: boolean;
 }

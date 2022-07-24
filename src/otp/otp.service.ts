@@ -80,4 +80,8 @@ export class OtpService {
 
     return otps[0];
   }
+
+  async deleteOtp(id: number): Promise<void> {
+    await this.otpRepo.softDelete({ id });
+  }
 }

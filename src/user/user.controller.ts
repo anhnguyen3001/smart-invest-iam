@@ -17,6 +17,7 @@ import { transformDtoWithoutGlobalPipe } from 'common/pipe';
 import { BaseResponse } from 'common/types/api-response.type';
 import { getBaseResponse } from 'common/utils/response';
 import { configService } from 'config/config.service';
+import { User } from 'storage/entities/user.entity';
 import {
   CreateUserDto,
   SearchUserDto,
@@ -65,34 +66,32 @@ export class UserController {
     @Body() upsertDto: unknown,
     @Query() upsertQueryDto: UpsertQueryDto,
   ): Promise<BaseResponse<Identity>> {
-    if (upsertQueryDto.id) {
+    let user: User;
+    const isUpdate = !!upsertQueryDto.id;
+
+    if (isUpdate) {
       // Update user
       const dto = await transformDtoWithoutGlobalPipe(upsertDto, UpdateUserDto);
 
-      const user = await this.userService.updateUser(upsertQueryDto.id, dto);
-      return getBaseResponse(
-        {
-          data: {
-            id: user.id,
-          },
-          code: ApiCode[200].UPDATE_SUCCESS.code,
-          message: ApiCode[200].UPDATE_SUCCESS.description,
-        },
-        Identity,
-      );
+      user = await this.userService.updateUser(upsertQueryDto.id, dto);
+    } else {
+      // Create user
+      const dto = await transformDtoWithoutGlobalPipe(upsertDto, CreateUserDto);
+
+      user = await this.userService.createUser(dto);
     }
 
-    // Create user
-    const dto = await transformDtoWithoutGlobalPipe(upsertDto, CreateUserDto);
+    const responseCodeAndMsg = isUpdate
+      ? ApiCode[200].UPDATE_SUCCESS
+      : ApiCode[201].CREATE_SUCCESS;
 
-    const user = await this.userService.createUser(dto);
     return getBaseResponse(
       {
         data: {
           id: user.id,
         },
-        code: ApiCode[201].CREATE_SUCCESS.code,
-        message: ApiCode[201].CREATE_SUCCESS.description,
+        code: responseCodeAndMsg.code,
+        message: responseCodeAndMsg.description,
       },
       Identity,
     );

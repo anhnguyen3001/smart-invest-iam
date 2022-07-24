@@ -5,7 +5,6 @@ import { EntityEnum } from 'common/constants/apiCode';
 import { ExistedException, NotFoundException } from 'common/exceptions';
 import { QueryBuilderType } from 'common/types/core.type';
 import { paginate } from 'common/utils/core';
-import { configService } from 'config/config.service';
 import { RoleService } from 'role/role.service';
 import { LoginMethodEnum, User } from 'storage/entities/user.entity';
 import {
@@ -37,6 +36,17 @@ export class UserService {
   async getListUsers(dto: SearchUserDto): Promise<SearchUsersResponse> {
     const { page = 1, pageSize = 10, getAll, ...rest } = dto;
 
+    if (getAll) {
+      const data = await this.getQueryBuilder(rest).getMany();
+      return {
+        users: data,
+        pagination: {
+          totalItems: data.length,
+          totalPages: 1,
+        },
+      };
+    }
+
     const { items, meta } = await paginate(this.getQueryBuilder(rest), {
       limit: pageSize,
       page,
@@ -51,18 +61,73 @@ export class UserService {
     };
   }
 
-  async createUser(data: CreateUserDto): Promise<User> {
-    const {
-      password,
-      method = LoginMethodEnum.local,
-      isVerified = false,
-      ...rest
-    } = data;
+  async upsertUser(
+    data: CreateUserDto | UpdateUserDto,
+    id: number,
+  ): Promise<User> {
+    const existedUser = await this.userRepo.findOne({ id, email: data.email });
 
-    const existedUser = await this.findVerifiedUserByEmail(data.email);
+    let newData = data;
+
+    if (id) {
+      if (!existedUser) {
+        throw new NotFoundException(EntityEnum.user);
+      }
+    } else {
+      if (existedUser.isVerified) {
+        throw new ExistedException(EntityEnum.user);
+      }
+
+      newData = {
+        method: LoginMethodEnum.local,
+        isVerified: false,
+        ...newData,
+      };
+    }
+
+    const formattedData = await this.formatUpsertData(newData);
+
     if (existedUser) {
+      return this.userRepo.save(
+        this.userRepo.merge(existedUser, formattedData),
+      );
+    }
+    return this.userRepo.save(this.userRepo.create(formattedData));
+  }
+
+  async createUser(data: CreateUserDto): Promise<User> {
+    const existedUser = await this.userRepo.findOne({ email: data.email });
+    if (existedUser.isVerified) {
       throw new ExistedException(EntityEnum.user);
     }
+
+    const formattedData = await this.formatUpsertData({
+      method: LoginMethodEnum.local,
+      isVerified: false,
+      ...data,
+    });
+
+    if (existedUser) {
+      return this.userRepo.save(this.userRepo.merge(existedUser, data));
+    }
+
+    return this.userRepo.save(this.userRepo.create(formattedData));
+  }
+
+  async updateUser(id: number, data: UpdateUserDto): Promise<User> {
+    const user = await this.findOneAndThrowNotFound(
+      { id, isVerified: true },
+      true,
+    );
+
+    const formattedData = await this.formatUpsertData(data);
+    return this.userRepo.save(this.userRepo.merge(user, formattedData));
+  }
+
+  private async formatUpsertData(
+    data: CreateUserDto | UpdateUserDto,
+  ): Promise<Partial<User>> {
+    const { password, method, roleCode, roleId } = data;
 
     let hashPassword;
     if (method === LoginMethodEnum.local) {
@@ -71,48 +136,21 @@ export class UserService {
       hashPassword = await this.hashPassword(password);
     }
 
-    const user = await this.userRepo.save(
-      this.userRepo.create({
-        password: hashPassword,
-        method,
-        isVerified,
-        ...rest,
-      }),
-    );
-
-    const role = await this.roleService.findOneAndThrowNotFound(
-      { code: configService.getValue('USER_ROLE_CODE') },
-      true,
-    );
-    user.role = role;
-
-    return this.userRepo.save(user);
-  }
-
-  async updateUser(id: number, data: UpdateUserDto): Promise<User> {
-    const user = await this.findOneAndThrowNotFound({ id }, true);
-
-    const { password, roleId } = data;
-
-    // Update password
-    if (password) {
-      data.password = await this.hashPassword(password);
-    }
-
-    // Update role
-    if (roleId) {
-      const role = await this.roleService.findOneAndThrowNotFound(
-        {
-          id: roleId,
-        },
+    let role;
+    if (roleId || roleCode) {
+      role = await this.roleService.findOneAndThrowNotFound(
+        { id: roleId, code: roleCode },
         true,
       );
-
-      user.role = role;
       delete data.roleId;
+      delete data.roleCode;
     }
 
-    return this.userRepo.save(this.userRepo.merge(user, data));
+    return {
+      ...data,
+      password: hashPassword,
+      role,
+    };
   }
 
   async deleteUser(id: number): Promise<void> {
@@ -160,7 +198,7 @@ export class UserService {
     return user;
   }
 
-  async getUserInfo(id: number): Promise<DetailUserDto> {
+  async getUserInfo(id: number, email: string): Promise<DetailUserDto> {
     const user = (await this.userRepo
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
@@ -172,6 +210,7 @@ export class UserService {
         'permission.id = rp.permission_id',
       )
       .where('user.id = :id', { id })
+      .andWhere('user.email = :email', { email })
       .getOne()) as any;
     return user;
   }

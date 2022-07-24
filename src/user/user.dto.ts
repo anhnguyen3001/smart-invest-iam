@@ -81,7 +81,7 @@ export class DetailUserDto extends PickType(User, [
   @ApiProperty({
     type: [Permission],
   })
-  permissions: Permission[];
+  permissions?: Permission[];
 }
 
 export class UserProfileResponseDto {
@@ -149,18 +149,28 @@ export class CreateUserDto {
   @IsEnum(LoginMethodEnum)
   @IsOptional()
   method?: LoginMethodEnum;
-}
-
-export class UpdateUserDto extends PartialType(
-  PickType(CreateUserDto, ['username', 'password', 'isVerified']),
-) {
-  @ApiProperty({ type: 'string', required: false })
-  @IsString()
-  @IsOptional()
-  avatar?: string;
 
   @ApiProperty({ type: 'number', required: false })
   @IsNumber()
   @IsOptional()
   roleId?: number;
+
+  @ApiProperty({ type: 'string', required: false })
+  @IsString()
+  @IsOptional()
+  roleCode?: string;
+
+  @ApiProperty({ type: 'string', required: false })
+  @IsString()
+  @IsOptional()
+  avatar?: string;
+}
+
+export class UpdateUserDto extends PartialType(
+  PickType(CreateUserDto, ['username', 'password', 'isVerified', 'roleId']),
+) {
+  @ApiProperty({ type: 'string', required: false })
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }
