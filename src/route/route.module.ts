@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PermissionModule } from 'permission/permission.module';
-import { StorageModule } from 'storage/storage.module';
+import { PermissionModule } from 'src/permission/permission.module';
+import { StorageModule } from 'src/storage/storage.module';
 import { RouteController } from './route.controller';
 import { RouteService } from './route.service';
 

@@ -9,8 +9,12 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { MethodEnum, Route } from 'storage/entities/route.entity';
+import {
+  BASE_SORT_BY,
+  QueryCoreDto,
+  ResponseWithPagination,
+} from 'src/common/dto';
+import { MethodEnum, Route } from 'src/storage/entities/route.entity';
 
 const ROUTE_SORT_BY = [...BASE_SORT_BY, 'name'];
 export class SearchRouteDto extends QueryCoreDto {

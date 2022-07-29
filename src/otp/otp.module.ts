@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { StorageModule } from 'storage/storage.module';
+import { StorageModule } from 'src/storage/storage.module';
 import { OtpService } from './otp.service';
 
 @Module({

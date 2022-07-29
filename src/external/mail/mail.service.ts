@@ -5,8 +5,6 @@ import { Injectable } from '@nestjs/common';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendMail();
-
   async sendVerifyUserMail(email: string, otp: string) {
     await this.mailerService.sendMail({
       to: email,

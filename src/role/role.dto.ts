@@ -14,8 +14,12 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { Role } from 'storage/entities/role.entity';
+import {
+  BASE_SORT_BY,
+  QueryCoreDto,
+  ResponseWithPagination,
+} from 'src/common/dto';
+import { Role } from 'src/storage/entities/role.entity';
 
 const ROLE_SORT_BY = BASE_SORT_BY;
 export class SearchRoleDto extends QueryCoreDto {

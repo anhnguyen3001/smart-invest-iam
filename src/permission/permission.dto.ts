@@ -12,8 +12,12 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { Permission } from 'storage/entities/permission.entity';
+import {
+  BASE_SORT_BY,
+  QueryCoreDto,
+  ResponseWithPagination,
+} from 'src/common/dto';
+import { Permission } from 'src/storage/entities/permission.entity';
 
 const PERMISSION_SORT_BY = BASE_SORT_BY;
 export class SearchPermissionDto extends QueryCoreDto {

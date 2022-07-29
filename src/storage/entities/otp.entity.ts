@@ -15,12 +15,12 @@ export class Otp extends CreateDeleteEntity {
   @Column({ length: 32 })
   secret: string;
 
-  @Column({ enum: OtpTypeEnum })
+  @Column({ type: 'enum', enum: OtpTypeEnum })
   type: string;
 
   @ManyToOne(() => User, (user) => user.otps)
   user: User;
 
-  @Column({ type: 'timestamp', precision: 6 })
+  @Column({ type: 'timestamp', precision: 6, nullable: true })
   expiredAt: string;
 }

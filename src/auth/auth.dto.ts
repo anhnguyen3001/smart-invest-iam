@@ -8,10 +8,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { PATTERN_VALIDATION } from 'common/constants/validation';
+import { PATTERN_VALIDATION } from 'src/common/constants/validation';
 import { InvalidCredentialException } from './auth.exception';
-import { OtpTypeEnum } from 'storage/entities/otp.entity';
-import { PasswordNotMatchException } from 'user/user.exception';
+import { OtpTypeEnum } from 'src/storage/entities/otp.entity';
+import { PasswordNotMatchException } from 'src/user/user.exception';
 import { Expose } from 'class-transformer';
 
 export class LoginDto {

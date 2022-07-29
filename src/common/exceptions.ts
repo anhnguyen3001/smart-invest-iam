@@ -75,7 +75,7 @@ export class NotFoundException extends APIException {
     super(
       ApiCode[404].NOT_FOUND.code,
       HttpStatus.NOT_FOUND,
-      `${field} ${ApiCode[404].NOT_FOUND.code}`,
+      `${field} ${ApiCode[404].NOT_FOUND.description}`,
     );
   }
 }
@@ -85,7 +85,7 @@ export class ExistedException extends APIException {
     super(
       ApiCode[400].EXISTED_ENTITY.code,
       HttpStatus.BAD_REQUEST,
-      `${field} ${ApiCode[400].EXISTED_ENTITY.code}`,
+      `${field} ${ApiCode[400].EXISTED_ENTITY.description}`,
     );
   }
 }

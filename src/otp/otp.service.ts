@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as speakeasy from 'speakeasy';
-import { Otp, OtpTypeEnum } from 'storage/entities/otp.entity';
-import { User } from 'storage/entities/user.entity';
+import { Otp, OtpTypeEnum } from 'src/storage/entities/otp.entity';
+import { User } from 'src/storage/entities/user.entity';
 import { MoreThan, Repository } from 'typeorm';
 import {
   InvalidCodeException,

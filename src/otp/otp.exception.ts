@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiCode } from 'common/constants/apiCode';
-import { APIException } from 'common/exceptions';
+import { ApiCode } from 'src/common/constants/apiCode';
+import { APIException } from 'src/common/exceptions';
 
 export class RecentlySentOtpException extends APIException {
   constructor() {

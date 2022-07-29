@@ -11,5 +11,4 @@ module.exports = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  coverageDirectory: path.join(__dirname, 'coverage'),
 };

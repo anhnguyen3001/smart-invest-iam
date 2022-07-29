@@ -31,7 +31,7 @@ export class Route extends BaseEntity {
 
   @Expose()
   @ApiProperty({ enum: MethodEnum })
-  @Column({ enum: MethodEnum })
+  @Column({ type: 'enum', enum: MethodEnum })
   method: MethodEnum;
 
   @Expose()

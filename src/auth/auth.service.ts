@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { EntityEnum } from 'common/constants/apiCode';
-import { ExistedException, NotFoundException } from 'common/exceptions';
-import { OtpService } from 'otp/otp.service';
-import { RoleService } from 'role/role.service';
-import { OtpTypeEnum } from 'storage/entities/otp.entity';
-import { LoginMethodEnum, User } from 'storage/entities/user.entity';
-import { DetailUserDto } from 'user/user.dto';
+import { EntityEnum } from 'src/common/constants/apiCode';
+import { ExistedException, NotFoundException } from 'src/common/exceptions';
+// import { OtpService } from 'src/otp/otp.service';
+import { RoleService } from 'src/role/role.service';
+import { OtpTypeEnum } from 'src/storage/entities/otp.entity';
+import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
+import { DetailUserDto } from 'src/user/user.dto';
 import { MailService } from '../external/mail/mail.service';
 import { UserService } from '../user/user.service';
 import {
@@ -34,7 +34,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-    private readonly otpService: OtpService,
+    // private readonly otpService: OtpService,
     private readonly roleService: RoleService,
   ) {}
 
@@ -86,15 +86,15 @@ export class AuthService {
       throw new VerifiedUserException();
     }
 
-    const otp = await this.otpService.verifyOtp(
-      user.id,
-      code,
-      OtpTypeEnum.verifyUser,
-    );
+    // const otp = await this.otpService.verifyOtp(
+    //   user.id,
+    //   code,
+    //   OtpTypeEnum.verifyUser,
+    // );
 
     await Promise.all([
       this.userService.updateById(user.id, { isVerified: true }),
-      this.otpService.deleteOtp(otp.id),
+      // this.otpService.deleteOtp(otp.id),
     ]);
   }
 
@@ -118,7 +118,7 @@ export class AuthService {
       true,
     );
 
-    await this.otpService.verifyOtp(id, code, OtpTypeEnum.resetPassword);
+    // await this.otpService.verifyOtp(id, code, OtpTypeEnum.resetPassword);
 
     await this.userService.updateById(id, { password });
   }
@@ -147,15 +147,13 @@ export class AuthService {
   }
 
   async sendVerifyUserMail(user: User): Promise<void> {
-    const otp = await this.otpService.generate(user, OtpTypeEnum.verifyUser);
-
-    await this.mailService.sendVerifyUserMail(user.email, otp);
+    // const otp = await this.otpService.generate(user, OtpTypeEnum.verifyUser);
+    // await this.mailService.sendVerifyUserMail(user.email, otp);
   }
 
   async sendForgetPasswordMail(user: User): Promise<void> {
-    const otp = await this.otpService.generate(user, OtpTypeEnum.resetPassword);
-
-    await this.mailService.sendForgetPasswordMail(user.email, otp);
+    // const otp = await this.otpService.generate(user, OtpTypeEnum.resetPassword);
+    // await this.mailService.sendForgetPasswordMail(user.email, otp);
   }
 
   async refreshToken(id: number, refreshToken: string): Promise<TokenResult> {

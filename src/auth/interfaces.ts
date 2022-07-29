@@ -1,4 +1,4 @@
-import { LoginMethodEnum } from 'storage/entities/user.entity';
+import { LoginMethodEnum } from 'src/storage/entities/user.entity';
 
 export interface IJWTPayload {
   sub: number;

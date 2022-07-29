@@ -14,12 +14,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiOkBaseResponse } from 'common/decorators/response.decorator';
-import { GetUser, GetUserId } from 'common/decorators/user.decorator';
-import { BaseResponse } from 'common/types/api-response.type';
-import { getBaseResponse } from 'common/utils/response';
-import { configService } from 'config/config.service';
-import { User } from 'storage/entities/user.entity';
+import { ApiOkBaseResponse } from 'src/common/decorators/response.decorator';
+import { GetUser, GetUserId } from 'src/common/decorators/user.decorator';
+import { BaseResponse } from 'src/common/types/api-response.type';
+import { getBaseResponse } from 'src/common/utils/response';
+import { configService } from 'src/config/config.service';
+import { User } from 'src/storage/entities/user.entity';
 import {
   ForgetPasswordDto,
   LoginDto,

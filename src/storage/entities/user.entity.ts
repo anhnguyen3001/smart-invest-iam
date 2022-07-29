@@ -61,7 +61,11 @@ export class User extends BaseEntity {
   @ApiProperty({
     enum: LoginMethodEnum,
   })
-  @Column({ enum: LoginMethodEnum, default: LoginMethodEnum.local })
+  @Column({
+    type: 'enum',
+    enum: LoginMethodEnum,
+    default: LoginMethodEnum.local,
+  })
   method?: LoginMethodEnum;
 
   @OneToMany(() => Otp, (otp) => otp.user)

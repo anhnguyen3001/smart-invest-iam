@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityEnum } from 'common/constants/apiCode';
-import { ExistedException, NotFoundException } from 'common/exceptions';
-import { QueryBuilderType } from 'common/types/core.type';
-import { paginate } from 'common/utils/core';
-import { PermissionService } from 'permission/permission.service';
-import { Role } from 'storage/entities/role.entity';
+import { EntityEnum } from 'src/common/constants/apiCode';
+import { ExistedException, NotFoundException } from 'src/common/exceptions';
+import { QueryBuilderType } from 'src/common/types/core.type';
+import { paginate } from 'src/common/utils/core';
+import { PermissionService } from 'src/permission/permission.service';
+import { Role } from 'src/storage/entities/role.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import {
   CreateRoleDto,
@@ -50,9 +50,20 @@ export class RoleService {
   }
 
   async createRole(data: CreateRoleDto): Promise<Role> {
-    const role = await this.findOneAndThrowNotFound({ code: data.code });
+    const { code, permissionIds } = data;
+    const role = await this.roleRepo.findOne({ code });
     if (role) {
       throw new ExistedException(EntityEnum.role);
+    }
+
+    if (permissionIds?.length) {
+      const permissions = await this.permisionService.findManyByIds(
+        permissionIds,
+      );
+      if (permissions?.length !== permissionIds.length) {
+        throw new NotFoundException(EntityEnum.permission);
+      }
+      role.permissions = permissions;
     }
 
     return this.roleRepo.save(this.roleRepo.create(data));
@@ -70,7 +81,6 @@ export class RoleService {
         throw new NotFoundException(EntityEnum.permission);
       }
 
-      delete data.permissionIds;
       role.permissions = permissions;
     }
 

@@ -19,11 +19,15 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { PATTERN_VALIDATION } from 'common/constants/validation';
-import { BASE_SORT_BY, QueryCoreDto, ResponseWithPagination } from 'common/dto';
-import { Permission } from 'storage/entities/permission.entity';
-import { Role } from 'storage/entities/role.entity';
-import { LoginMethodEnum, User } from 'storage/entities/user.entity';
+import { PATTERN_VALIDATION } from 'src/common/constants/validation';
+import {
+  BASE_SORT_BY,
+  QueryCoreDto,
+  ResponseWithPagination,
+} from 'src/common/dto';
+import { Permission } from 'src/storage/entities/permission.entity';
+import { Role } from 'src/storage/entities/role.entity';
+import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
 import { PasswordNotMatchException } from './user.exception';
 
 export class UpdatePasswordDto {

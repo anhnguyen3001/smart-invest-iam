@@ -1,4 +1,4 @@
-import { configService } from 'config/config.service';
+import { configService } from 'src/config/config.service';
 
 export const JWT_SECRET_KEY = {
   at: configService.getValue('ACCESS_TOKEN_SECRET'),
