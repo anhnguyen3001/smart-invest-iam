@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as speakeasy from 'speakeasy';
+import {
+  UnverifiedUserException,
+  VerifiedUserException,
+} from 'src/auth/auth.exception';
+import { MailService } from 'src/external/mail/mail.service';
 import { Otp, OtpTypeEnum } from 'src/storage/entities/otp.entity';
-import { User } from 'src/storage/entities/user.entity';
+import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 import { MoreThan, Repository } from 'typeorm';
+import { SendOtpDto } from './otp.dto';
 import {
   InvalidCodeException,
   RecentlySentOtpException,
@@ -13,7 +20,33 @@ import {
 export class OtpService {
   private encoding: speakeasy.Encoding = 'base32';
 
-  constructor(@InjectRepository(Otp) private otpRepo: Repository<Otp>) {}
+  constructor(
+    @InjectRepository(Otp) private otpRepo: Repository<Otp>,
+    private readonly userService: UserService,
+    private readonly mailService: MailService,
+  ) {}
+
+  async sendOtp(data: SendOtpDto): Promise<void> {
+    const { email, type } = data;
+
+    const user = await this.userService.findOneAndThrowNotFound(
+      { email, method: LoginMethodEnum.local },
+      true,
+    );
+
+    if (type === OtpTypeEnum.verifyUser) {
+      if (user.isVerified) {
+        throw new VerifiedUserException();
+      }
+    } else {
+      if (!user.isVerified) {
+        throw new UnverifiedUserException();
+      }
+    }
+
+    const otp = await this.generate(user, type);
+    await this.mailService.sendEmail(email, otp, type);
+  }
 
   async generate(user: User, type: OtpTypeEnum): Promise<string> {
     const existedOtps = await this.otpRepo.find({

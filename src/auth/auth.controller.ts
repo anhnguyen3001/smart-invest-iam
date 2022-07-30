@@ -25,7 +25,6 @@ import {
   LoginDto,
   LoginSocialDto,
   RecoverPasswordDto,
-  ResendOtpQueryDto,
   SignupDto,
   TokenResult,
   VerifyOtpQueryDto,
@@ -33,7 +32,6 @@ import {
 import { AuthService } from './auth.service';
 import { FBAuthGuard } from './guards/facebook-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { RtGuard } from './guards/rt.guard';
 
 @ApiTags('Auth')
 @Controller({
@@ -88,7 +86,7 @@ export class AuthController {
     return getBaseResponse<TokenResult>({ data: tokens }, TokenResult);
   }
 
-  @Get('logout')
+  // @Get('logout')
   async logout(@GetUserId() id: number): Promise<void> {
     await this.authService.logout(id);
   }
@@ -135,27 +133,5 @@ export class AuthController {
   @ApiOkResponse({ description: 'Reset password successfully' })
   async recoverPassword(@Body() dto: RecoverPasswordDto): Promise<void> {
     await this.authService.recoverPassword(dto);
-  }
-
-  @Get('resend')
-  @ApiOperation({
-    summary: 'Resend OTP',
-  })
-  @ApiOkResponse({ description: 'Resend otp success' })
-  async resendOtp(@Query() query: ResendOtpQueryDto): Promise<void> {
-    await this.authService.resendOtp(query);
-  }
-
-  @UseGuards(RtGuard)
-  @Get('refresh-token')
-  @ApiOkBaseResponse(TokenResult, {
-    description: 'Refresh token successfully',
-  })
-  async refreshToken(
-    @GetUserId() id: number,
-    @GetUser('refreshToken') refreshToken: string,
-  ): Promise<BaseResponse<TokenResult>> {
-    const tokens = await this.authService.refreshToken(id, refreshToken);
-    return getBaseResponse({ data: tokens }, TokenResult);
   }
 }
