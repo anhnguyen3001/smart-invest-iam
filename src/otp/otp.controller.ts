@@ -12,7 +12,7 @@ import { OtpService } from './otp.service';
 export class OtpController {
   constructor(private readonly otpService: OtpService) {}
 
-  @Get()
+  @Get('send')
   @ApiOperation({
     summary: 'Send opt to email successfully',
   })
