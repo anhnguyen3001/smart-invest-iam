@@ -14,7 +14,7 @@ import { StorageModule } from './storage/storage.module';
     AuthModule,
     UserModule,
     MailModule,
-    // OtpModule,
+    OtpModule,
     RouteModule,
     RoleModule,
     PermissionModule,
