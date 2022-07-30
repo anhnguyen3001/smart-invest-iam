@@ -89,7 +89,7 @@ export class ForgetPasswordDto {
   email: string;
 }
 
-export class VerifyOtpQueryDto {
+export class VerifyOtpDto {
   @ApiProperty({ type: 'string' })
   @IsString()
   @Matches(PATTERN_VALIDATION.email)
@@ -117,16 +117,7 @@ export class ResendOtpQueryDto {
   email: string;
 }
 
-export class RecoverPasswordDto {
-  @ApiProperty({ type: 'string' })
-  @IsString()
-  @Matches(PATTERN_VALIDATION.email)
-  email: string;
-
-  @ApiProperty({ type: 'string' })
-  @IsString()
-  code: string;
-
+export class RecoverPasswordDto extends VerifyOtpDto {
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
   newPassword: string;

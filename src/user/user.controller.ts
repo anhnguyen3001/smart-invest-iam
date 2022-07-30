@@ -41,7 +41,7 @@ export class UserController {
   @ApiOkBaseResponse(SearchUsersResponse, {
     description: 'Get users by queries successfully',
   })
-  async getListRoutes(
+  async getListUsers(
     @Query() dto: SearchUserDto,
   ): Promise<BaseResponse<SearchUsersResponse>> {
     const data = await this.userService.getListUsers(dto);
@@ -106,7 +106,7 @@ export class UserController {
     status: 204,
     description: 'Delete user successfully',
   })
-  async deleteRoute(@Param() params: RequestParamId): Promise<void> {
+  async deleteUser(@Param() params: RequestParamId): Promise<void> {
     await this.userService.deleteUser(params.id);
   }
 }

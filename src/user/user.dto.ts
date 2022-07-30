@@ -30,7 +30,11 @@ import { Role } from 'src/storage/entities/role.entity';
 import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
 import { PasswordNotMatchException } from './user.exception';
 
-export class UpdatePasswordDto {
+export class ChangePasswordDto {
+  @ApiProperty({ type: 'string' })
+  @Matches(PATTERN_VALIDATION.password)
+  oldPassword: string;
+
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
   newPassword: string;
@@ -44,12 +48,6 @@ export class UpdatePasswordDto {
       throw new PasswordNotMatchException();
     }
   }
-}
-
-export class ChangePasswordDto extends UpdatePasswordDto {
-  @ApiProperty({ type: 'string' })
-  @Matches(PATTERN_VALIDATION.password)
-  oldPassword: string;
 }
 
 export class UpdateProfileDto {

@@ -27,7 +27,7 @@ import {
   RecoverPasswordDto,
   SignupDto,
   TokenResult,
-  VerifyOtpQueryDto,
+  VerifyOtpDto,
 } from './auth.dto';
 import { AuthService } from './auth.service';
 import { FBAuthGuard } from './guards/facebook-auth.guard';
@@ -110,7 +110,7 @@ export class AuthController {
   @ApiOkResponse({
     description: 'Verify account successfully',
   })
-  async verifyUser(@Query() query: VerifyOtpQueryDto): Promise<void> {
+  async verifyUser(@Query() query: VerifyOtpDto): Promise<void> {
     await this.authService.verifyUser(query);
   }
 
@@ -128,9 +128,9 @@ export class AuthController {
   @Post('recover/password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Reset password',
+    summary: 'Recover password',
   })
-  @ApiOkResponse({ description: 'Reset password successfully' })
+  @ApiOkResponse({ description: 'Recover password successfully' })
   async recoverPassword(@Body() dto: RecoverPasswordDto): Promise<void> {
     await this.authService.recoverPassword(dto);
   }

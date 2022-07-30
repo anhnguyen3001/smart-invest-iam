@@ -6,7 +6,6 @@ import { BaseResponse } from 'src/common/types/api-response.type';
 import { getBaseResponse } from 'src/common/utils/response';
 import { configService } from 'src/config/config.service';
 import { UserProfileResponseDto } from './user.dto';
-import { UserService } from './user.service';
 
 @ApiTags('UserProfile')
 @Controller({
@@ -14,8 +13,6 @@ import { UserService } from './user.service';
   version: configService.getValue('API_VERSION'),
 })
 export class UserProfileController {
-  constructor(private readonly userService: UserService) {}
-
   @UseGuards(RtGuard)
   @Get()
   @ApiOperation({

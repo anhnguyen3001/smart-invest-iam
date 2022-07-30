@@ -14,7 +14,7 @@ import {
   RecoverPasswordDto,
   SignupDto,
   TokenResult,
-  VerifyOtpQueryDto,
+  VerifyOtpDto,
 } from './auth.dto';
 import {
   AccessDeniedException,
@@ -75,7 +75,7 @@ export class AuthService {
     return user;
   }
 
-  async verifyUser(query: VerifyOtpQueryDto): Promise<void> {
+  async verifyUser(query: VerifyOtpDto): Promise<void> {
     const { email, code } = query;
 
     const user = await this.userService.findOneAndThrowNotFound({ email });
