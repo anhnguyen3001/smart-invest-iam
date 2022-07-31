@@ -14,7 +14,7 @@ import { configService } from 'src/config/config.service';
         },
       },
       defaults: {
-        from: `AH Ticker <${configService.getValue('MAIL_ACCOUNT')}>`,
+        from: `Smart invest <${configService.getValue('MAIL_ACCOUNT')}>`,
       },
     }),
   ],

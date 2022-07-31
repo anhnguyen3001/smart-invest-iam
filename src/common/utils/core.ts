@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { SelectQueryBuilder } from 'typeorm';
 
 interface IPaginationMeta {
@@ -52,4 +53,9 @@ export const paginate = async <T>(
       totalPages,
     },
   };
+};
+
+export const hashData = async (data: string) => {
+  const salt = await bcrypt.genSalt();
+  return await bcrypt.hash(data, salt);
 };

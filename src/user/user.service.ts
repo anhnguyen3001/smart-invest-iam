@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { EntityEnum } from 'src/common/constants/apiCode';
 import { ExistedException, NotFoundException } from 'src/common/exceptions';
 import { QueryBuilderType } from 'src/common/types/core.type';
-import { paginate } from 'src/common/utils/core';
+import { hashData, paginate } from 'src/common/utils/core';
 import { RoleService } from 'src/role/role.service';
 import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
 import {
@@ -97,7 +97,7 @@ export class UserService {
 
   async createUser(data: CreateUserDto): Promise<User> {
     const existedUser = await this.userRepo.findOne({ email: data.email });
-    if (existedUser.isVerified) {
+    if (existedUser?.isVerified) {
       throw new ExistedException(EntityEnum.user);
     }
 
@@ -133,7 +133,7 @@ export class UserService {
     if (method === LoginMethodEnum.local) {
       if (!password) throw new LackPasswordException();
 
-      hashPassword = await this.hashPassword(password);
+      hashPassword = await hashData(password);
     }
 
     let role;
@@ -225,9 +225,7 @@ export class UserService {
   }
 
   async updateById(id: number, data: Partial<User>): Promise<void> {
-    const password = data.password
-      ? await this.hashPassword(data.password)
-      : undefined;
+    const password = data.password ? await hashData(data.password) : undefined;
 
     await this.userRepo.update(
       { id },
@@ -236,11 +234,6 @@ export class UserService {
         ...(password && { password }),
       },
     );
-  }
-
-  async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    return await bcrypt.hash(password, salt);
   }
 
   getQueryBuilder(
