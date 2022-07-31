@@ -1,6 +1,6 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RtGuard } from 'src/auth/guards/rt.guard';
+import { AtGuard } from 'src/auth/guards/at.guard';
 import { ApiOkBaseResponse } from 'src/common/decorators/response.decorator';
 import { BaseResponse } from 'src/common/types/api-response.type';
 import { getBaseResponse } from 'src/common/utils/response';
@@ -13,7 +13,7 @@ import { UserProfileResponseDto } from './user.dto';
   version: configService.getValue('API_VERSION'),
 })
 export class UserProfileController {
-  @UseGuards(RtGuard)
+  @UseGuards(AtGuard)
   @Get()
   @ApiOperation({
     summary: 'Get user info',

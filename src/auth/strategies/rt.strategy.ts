@@ -9,7 +9,7 @@ import { JWT_SECRET_KEY } from 'src/auth/constants';
 import { IJWTPayload } from 'src/auth/interfaces';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, STRATEGY.rt) {
+export class RtStrategy extends PassportStrategy(Strategy, STRATEGY.rt) {
   constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
