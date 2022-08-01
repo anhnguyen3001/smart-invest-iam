@@ -12,7 +12,7 @@ export class APIException extends HttpException {
     code: string | number,
     status: HttpStatus,
     message: string,
-    details?: any,
+    details?,
   ) {
     const exceptionResponse = {
       code,
@@ -29,7 +29,6 @@ export class APIException extends HttpException {
     return {
       code: this.code,
       message: this.message,
-      details: this.details,
     };
   }
 
@@ -47,15 +46,11 @@ export class ValidationException extends APIException {
 }
 
 export class ExternalAPIException extends APIException {
-  constructor(
-    message = ApiCode[424].EXTERNAL_API_ERROR.description,
-    details?: any,
-  ) {
+  constructor(message = ApiCode[424].EXTERNAL_API_ERROR.description) {
     super(
       ApiCode[424].EXTERNAL_API_ERROR.code,
       HttpStatus.FAILED_DEPENDENCY,
       message,
-      details,
     );
   }
 }
@@ -128,7 +123,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
           ApiCode[500].UNKNOWN_ERROR.code,
           500,
           ApiCode[500].UNKNOWN_ERROR.description,
-          JSON.stringify(exception),
         ).toObj(),
       );
   }

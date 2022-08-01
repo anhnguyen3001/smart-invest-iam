@@ -141,7 +141,7 @@ export class UserService {
     let role;
     if (roleId || roleCode) {
       role = await this.roleService.findOneAndThrowNotFound(
-        { id: roleId, code: roleCode },
+        roleCode ? { id: roleId } : { code: roleCode },
         true,
       );
       delete data.roleId;
