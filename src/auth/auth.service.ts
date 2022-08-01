@@ -18,7 +18,7 @@ import {
 } from './auth.dto';
 import {
   AccessDeniedException,
-  InvalidCredentialException,
+  IncorrectEmailPasswordException,
   VerifiedUserException,
 } from './auth.exception';
 import { JWT_SECRET_KEY } from './constants';
@@ -34,17 +34,16 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<TokenResult> {
     dto.validate();
-
     const { email, password } = dto;
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
-      throw new InvalidCredentialException();
+      throw new IncorrectEmailPasswordException();
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
-      throw new InvalidCredentialException();
+      throw new IncorrectEmailPasswordException();
     }
 
     return this.getTokens(user);
@@ -106,7 +105,7 @@ export class AuthService {
   async recoverPassword(data: RecoverPasswordDto): Promise<void> {
     data.validate();
 
-    const { newPassword: password, code, email } = data;
+    const { password, code, email } = data;
     const { id } = await this.userService.findOneAndThrowNotFound(
       { email, isVerified: true, method: LoginMethodEnum.local },
       true,

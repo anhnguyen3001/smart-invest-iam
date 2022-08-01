@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as speakeasy from 'speakeasy';
 import {
-  UnverifiedUserException,
+  IncorrectEmailException,
   VerifiedUserException,
 } from 'src/auth/auth.exception';
 import { MailService } from 'src/external/mail/mail.service';
@@ -40,7 +40,7 @@ export class OtpService {
       }
     } else {
       if (!user.isVerified) {
-        throw new UnverifiedUserException();
+        throw new IncorrectEmailException();
       }
     }
 

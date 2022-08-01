@@ -1,4 +1,5 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
@@ -9,10 +10,9 @@ import {
   MinLength,
 } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common/constants/validation';
-import { InvalidCredentialException } from './auth.exception';
 import { OtpTypeEnum } from 'src/storage/entities/otp.entity';
-import { PasswordNotMatchException } from 'src/user/user.exception';
-import { Expose } from 'class-transformer';
+import { validatePassword } from 'src/user/common';
+import { IncorrectEmailPasswordException } from './auth.exception';
 
 export class LoginDto {
   @ApiProperty({ type: 'string' })
@@ -28,7 +28,7 @@ export class LoginDto {
       !PATTERN_VALIDATION.email.test(this.email) ||
       !PATTERN_VALIDATION.password.test(this.password)
     ) {
-      throw new InvalidCredentialException();
+      throw new IncorrectEmailPasswordException();
     }
   }
 }
@@ -81,9 +81,7 @@ export class SignupDto {
   roleCode?: string;
 
   validate() {
-    if (this.password !== this.confirmPassword) {
-      throw new PasswordNotMatchException();
-    }
+    validatePassword(this.password, this.confirmPassword);
   }
 }
 
@@ -125,15 +123,15 @@ export class ResendOtpQueryDto {
 export class RecoverPasswordDto extends VerifyOtpDto {
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
-  newPassword: string;
+  @IsString()
+  password: string;
 
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
+  @IsString()
   confirmPassword: string;
 
   validate() {
-    if (this.newPassword !== this.confirmPassword) {
-      throw new PasswordNotMatchException();
-    }
+    validatePassword(this.password, this.confirmPassword);
   }
 }

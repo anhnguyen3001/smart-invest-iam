@@ -2,12 +2,22 @@ import { HttpStatus } from '@nestjs/common';
 import { ApiCode } from 'src/common/constants/apiCode';
 import { APIException } from 'src/common/exceptions';
 
-export class InvalidCredentialException extends APIException {
+export class IncorrectEmailPasswordException extends APIException {
   constructor() {
     super(
-      ApiCode[400].INVALID_CREDENTIALS.code,
+      ApiCode[400].INCORRECT_EMAIL_PASSWORD.code,
       HttpStatus.BAD_REQUEST,
-      ApiCode[400].INVALID_CREDENTIALS.description,
+      ApiCode[400].INCORRECT_EMAIL_PASSWORD.description,
+    );
+  }
+}
+
+export class IncorrectEmailException extends APIException {
+  constructor() {
+    super(
+      ApiCode[400].INCORRECT_EMAIL.code,
+      HttpStatus.BAD_REQUEST,
+      ApiCode[400].INCORRECT_EMAIL.description,
     );
   }
 }
@@ -32,32 +42,12 @@ export class AccessDeniedException extends APIException {
   }
 }
 
-export class InvalidTokenException extends APIException {
-  constructor() {
-    super(
-      ApiCode[400].INVALID_TOKEN.code,
-      HttpStatus.BAD_REQUEST,
-      ApiCode[400].INVALID_TOKEN.description,
-    );
-  }
-}
-
 export class VerifiedUserException extends APIException {
   constructor() {
     super(
       ApiCode[400].VERIFIED_USER.code,
       HttpStatus.BAD_REQUEST,
       ApiCode[400].VERIFIED_USER.description,
-    );
-  }
-}
-
-export class UnverifiedUserException extends APIException {
-  constructor() {
-    super(
-      ApiCode[400].UNVERIFIED_USER.code,
-      HttpStatus.BAD_REQUEST,
-      ApiCode[400].UNVERIFIED_USER.description,
     );
   }
 }

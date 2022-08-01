@@ -44,51 +44,45 @@ export const ApiCode = {
     },
 
     // User
-    USER_EXISTED: {
-      code: '1002',
-      description: 'User has been existed',
-    },
     PASSWORD_NOT_MATCH: {
-      code: '1003',
+      code: '100',
       description: "Password and confirm password don't match",
     },
-    OLD_PASSWORD_INCORRECT: {
-      code: '1004',
-      description: 'Old password is incorrect',
+    INVALID_PASSWORD: {
+      code: '101',
+      description: 'Password is incorrect',
     },
-    INVALID_TOKEN: {
-      code: '1005',
-      description: 'Invalid token',
+    SAME_OLD_NEW_PASSWORD: {
+      code: '102',
+      description: 'Old and new password have to be different',
     },
     VERIFIED_USER: {
-      code: '1006',
-      description: 'Your email had already been verified',
+      code: '103',
+      description: 'Your account had already been verified',
     },
-    INVALID_CREDENTIALS: {
-      code: '1005',
-      description: 'Invalid credentials',
+    INCORRECT_EMAIL: {
+      code: '104',
+      description: 'Your email is incorrecy.',
     },
-    LACK_PASSWORD: {
-      code: '1006',
-      description: 'Lack of password to create account',
+    INCORRECT_EMAIL_PASSWORD: {
+      code: '105',
+      description: 'Your email or password is incorrect.',
     },
+
+    // Otp
     RECENTLY_SENT_OTP: {
-      code: '1007',
+      code: '200',
       description: 'OTP has recently been sent',
     },
     INVALID_OTP: {
-      code: '1008',
-      description: 'Invalid OTP',
-    },
-    UNVERIFIED_USER: {
-      code: '1009',
-      description: 'Your email had not been verified',
+      code: '201',
+      description: 'Invalid OTP.',
     },
 
     // Role
     REMOVE_USED_ROLE: {
-      code: '2001',
-      description: 'Role is used ',
+      code: '200',
+      description: 'Role is used.',
     },
   },
 

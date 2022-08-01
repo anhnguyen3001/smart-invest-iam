@@ -33,7 +33,7 @@ export class APIException extends HttpException {
   }
 
   toJSON(): string {
-    return JSON.stringify(this.toObj());
+    return JSON.stringify({ ...this.toObj(), details: this.details });
   }
 }
 

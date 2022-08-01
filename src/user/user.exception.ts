@@ -12,12 +12,22 @@ export class PasswordNotMatchException extends APIException {
   }
 }
 
-export class OldPasswordWrongException extends APIException {
+export class SameOldNewPasswordException extends APIException {
   constructor() {
     super(
-      ApiCode[400].OLD_PASSWORD_INCORRECT.code,
+      ApiCode[400].SAME_OLD_NEW_PASSWORD.code,
       HttpStatus.BAD_REQUEST,
-      ApiCode[400].OLD_PASSWORD_INCORRECT.description,
+      ApiCode[400].SAME_OLD_NEW_PASSWORD.description,
+    );
+  }
+}
+
+export class InvalidPasswordException extends APIException {
+  constructor() {
+    super(
+      ApiCode[400].INVALID_PASSWORD.code,
+      HttpStatus.BAD_REQUEST,
+      ApiCode[400].INVALID_PASSWORD.description,
     );
   }
 }

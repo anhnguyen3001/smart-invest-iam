@@ -14,9 +14,7 @@ import {
   IsOptional,
   IsString,
   Matches,
-  Max,
   MaxLength,
-  Min,
   MinLength,
 } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common/constants/validation';
@@ -28,9 +26,13 @@ import {
 import { Permission } from 'src/storage/entities/permission.entity';
 import { Role } from 'src/storage/entities/role.entity';
 import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
-import { PasswordNotMatchException } from './user.exception';
+import { validatePassword } from './common';
 
 export class ChangePasswordDto {
+  @ApiProperty({ type: 'number' })
+  @IsNumber()
+  userId: number;
+
   @ApiProperty({ type: 'string' })
   @Matches(PATTERN_VALIDATION.password)
   oldPassword: string;
@@ -44,23 +46,19 @@ export class ChangePasswordDto {
   confirmPassword: string;
 
   validate() {
-    if (this.newPassword !== this.confirmPassword) {
-      throw new PasswordNotMatchException();
-    }
+    validatePassword(this.newPassword, this.confirmPassword, this.oldPassword);
   }
 }
 
 export class UpdateProfileDto {
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', maxLength: 255 })
   @MaxLength(255)
-  @MinLength(1)
   @IsString()
   @IsOptional()
   username?: string;
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', maxLength: 255 })
   @MaxLength(255)
-  @MinLength(1)
   @IsString()
   @IsOptional()
   avatar?: string;
@@ -130,10 +128,10 @@ export class CreateUserDto {
   @Matches(PATTERN_VALIDATION.email)
   email: string;
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', maxLength: 255, minLength: 1 })
+  @MaxLength(255)
+  @MinLength(1)
   @IsString()
-  @Max(255)
-  @Min(1)
   username: string;
 
   @ApiProperty({ type: 'boolean', required: false })
@@ -169,10 +167,11 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(
-  PickType(CreateUserDto, ['username', 'password', 'isVerified', 'roleId']),
-) {
-  @ApiProperty({ type: 'string', required: false })
-  @IsString()
-  @IsOptional()
-  avatar?: string;
-}
+  PickType(CreateUserDto, [
+    'username',
+    'password',
+    'isVerified',
+    'roleId',
+    'avatar',
+  ]),
+) {}

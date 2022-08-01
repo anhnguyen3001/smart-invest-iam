@@ -23,7 +23,7 @@ import {
 } from './user.dto';
 import {
   LackPasswordException,
-  OldPasswordWrongException,
+  InvalidPasswordException,
 } from './user.exception';
 
 @Injectable()
@@ -141,7 +141,7 @@ export class UserService {
     let role;
     if (roleId || roleCode) {
       role = await this.roleService.findOneAndThrowNotFound(
-        roleCode ? { id: roleId } : { code: roleCode },
+        roleId ? { id: roleId } : { code: roleCode },
         true,
       );
       delete data.roleId;
@@ -161,19 +161,19 @@ export class UserService {
     await this.userRepo.softRemove(user);
   }
 
-  // TODO: BFF
-  async changePassword(id: number, data: ChangePasswordDto): Promise<void> {
+  async changePassword(data: ChangePasswordDto): Promise<void> {
     data.validate();
 
-    const user = await this.findOneById(id);
+    const { oldPassword, newPassword, userId } = data;
 
-    const { oldPassword, newPassword } = data;
+    const user = await this.findOneById(userId);
+
     const passwordMatches = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatches) {
-      throw new OldPasswordWrongException();
+      throw new InvalidPasswordException();
     }
 
-    await this.updateById(id, { password: newPassword });
+    await this.updateById(userId, { password: await hashData(newPassword) });
   }
 
   async findVerifiedUserByEmail(
