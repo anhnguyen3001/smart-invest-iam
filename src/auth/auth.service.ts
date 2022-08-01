@@ -66,10 +66,13 @@ export class AuthService {
     const user = await this.userService.createUser(restDto);
 
     if (sendVerifiedEmail) {
-      await this.otpService.sendOtp({
-        email: user.email,
-        type: OtpTypeEnum.verifyUser,
-      });
+      await this.otpService.sendOtp(
+        {
+          email: user.email,
+          type: OtpTypeEnum.verifyUser,
+        },
+        false,
+      );
     }
 
     return user;

@@ -26,7 +26,7 @@ export class OtpService {
     private readonly mailService: MailService,
   ) {}
 
-  async sendOtp(data: SendOtpDto): Promise<void> {
+  async sendOtp(data: SendOtpDto, validateLimitTime = true): Promise<void> {
     const { email, type } = data;
 
     const user = await this.userService.findOneAndThrowNotFound(
@@ -44,21 +44,27 @@ export class OtpService {
       }
     }
 
-    const otp = await this.generate(user, type);
+    const otp = await this.generate(user, type, validateLimitTime);
     await this.mailService.sendEmail(email, otp, type);
   }
 
-  async generate(user: User, type: OtpTypeEnum): Promise<string> {
-    const existedOtps = await this.otpRepo.find({
-      relations: ['user'],
-      where: {
-        user: { id: user.id },
-        type,
-        expiredAt: MoreThan(new Date()),
-      },
-    });
-    if (existedOtps.length) {
-      throw new RecentlySentOtpException();
+  async generate(
+    user: User,
+    type: OtpTypeEnum,
+    validateLimitTime = true,
+  ): Promise<string> {
+    if (validateLimitTime) {
+      const existedOtps = await this.otpRepo.find({
+        relations: ['user'],
+        where: {
+          user: { id: user.id },
+          type,
+          expiredAt: MoreThan(new Date()),
+        },
+      });
+      if (existedOtps.length) {
+        throw new RecentlySentOtpException();
+      }
     }
 
     const expiredSeconds = 5 * 60;
