@@ -40,7 +40,7 @@ export const ApiCode = {
     },
     EXISTED_ENTITY: {
       code: '002',
-      description: 'User has been existed',
+      description: 'has been existed',
     },
 
     // User
