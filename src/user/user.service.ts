@@ -107,6 +107,9 @@ export class UserService {
       ...data,
     });
 
+    console.log(formattedData);
+    return;
+
     if (existedUser) {
       return this.userRepo.save(this.userRepo.merge(existedUser, data));
     }
