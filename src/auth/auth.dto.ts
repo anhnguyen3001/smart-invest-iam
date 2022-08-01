@@ -75,6 +75,11 @@ export class SignupDto {
   @IsOptional()
   sendVerifiedEmail?: boolean = true;
 
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  @IsOptional()
+  roleCode?: string;
+
   validate() {
     if (this.password !== this.confirmPassword) {
       throw new PasswordNotMatchException();
