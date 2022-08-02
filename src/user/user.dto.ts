@@ -70,6 +70,7 @@ export class DetailUserDto extends PickType(User, [
   'isVerified',
   'method',
   'username',
+  'email',
 ]) {
   @Expose()
   @ApiProperty({
