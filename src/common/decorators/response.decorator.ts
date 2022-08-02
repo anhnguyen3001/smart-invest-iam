@@ -13,7 +13,7 @@ export const ApiOkBaseResponse = <TModel extends Type<any>>(
 ) => {
   return applyDecorators(
     ApiOkResponse({
-      // ...responseOptions,
+      ...responseOptions,
       schema: {
         $ref: getSchemaPath(BaseResponse),
         properties: {
