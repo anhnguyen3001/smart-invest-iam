@@ -6,7 +6,6 @@ import {
 } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
-  IsArray,
   IsIn,
   IsNumber,
   IsOptional,
@@ -14,6 +13,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ToArray } from 'src/common/decorators/request.decorator';
 import {
   BASE_SORT_BY,
   QueryCoreDto,
@@ -51,7 +51,7 @@ export class CreateRoleDto {
 
   @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
-  @IsArray()
+  @ToArray('number')
   @IsOptional()
   permissionIds?: number[];
 }

@@ -9,6 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ToArray } from 'src/common/decorators/request.decorator';
 import {
   BASE_SORT_BY,
   QueryCoreDto,
@@ -25,6 +26,7 @@ export class SearchRouteDto extends QueryCoreDto {
 
   @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
+  @ToArray('number')
   @IsOptional()
   permissionIds?: number[];
 

@@ -5,6 +5,7 @@ import {
   ApiQuery,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export const ApiUpsert = (CreateDto: Type, UpdateDto: Type) => {
   const createSchemaPath = getSchemaPath(CreateDto);
@@ -32,3 +33,25 @@ export const ApiUpsert = (CreateDto: Type, UpdateDto: Type) => {
     ApiExtraModels(CreateDto, UpdateDto),
   );
 };
+
+export function ToArray(
+  type: 'string' | 'number' = 'string',
+  separator = ',',
+): (target: any, key: string) => void {
+  return Transform(
+    (params) => {
+      const value = params.value;
+      if (!!value && typeof value === 'string') {
+        const values = value.split(separator);
+        switch (type) {
+          case 'number':
+            return values.map((el) => parseFloat(el));
+          default:
+            return values;
+        }
+      }
+      return value;
+    },
+    { toClassOnly: true },
+  );
+}

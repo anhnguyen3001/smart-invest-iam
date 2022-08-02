@@ -6,7 +6,6 @@ import {
 } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
-  IsArray,
   IsBoolean,
   IsEnum,
   IsIn,
@@ -18,6 +17,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common/constants/validation';
+import { ToArray } from 'src/common/decorators/request.decorator';
 import {
   BASE_SORT_BY,
   QueryCoreDto,
@@ -111,7 +111,7 @@ export class SearchUserDto extends QueryCoreDto {
 
   @ApiProperty({ type: [Number], required: false })
   @IsNumber({}, { each: true })
-  @IsArray()
+  @ToArray('number')
   @IsOptional()
   userIds?: number[];
 }
