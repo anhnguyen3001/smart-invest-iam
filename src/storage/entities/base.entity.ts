@@ -6,14 +6,14 @@ export class CreateDeleteEntity {
   @CreateDateColumn({
     type: 'timestamp',
     precision: 6,
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: () => 'NOW()',
   })
   createdAt: string;
 
   @DeleteDateColumn({
     type: 'timestamp',
     precision: 6,
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'NOW()',
   })
   deletedAt: string;
 }
@@ -23,8 +23,8 @@ export class BaseEntity extends CreateDeleteEntity {
   @UpdateDateColumn({
     type: 'timestamp',
     precision: 6,
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
+    default: () => 'NOW()',
+    onUpdate: 'NOW()',
   })
   updatedAt: string;
 }
