@@ -159,7 +159,7 @@ export class AuthService {
         email,
       },
       {
-        expiresIn: '1h',
+        expiresIn: '1w',
         secret: JWT_SECRET_KEY.at,
       },
     );
