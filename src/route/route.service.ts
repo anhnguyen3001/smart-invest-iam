@@ -136,7 +136,7 @@ export class RouteService {
   getQueryBuilder(
     dto: QueryBuilderType<SearchRouteDto>,
   ): SelectQueryBuilder<Route> {
-    const { q, orderBy, sortBy, permissionIds, ...rest } = dto;
+    const { q, orderBy, sortBy, permissionIds, path, ...rest } = dto;
     let queryBuilder = this.routeRepo
       .createQueryBuilder('route')
       .leftJoinAndSelect('route.permission', 'permission');
@@ -150,6 +150,12 @@ export class RouteService {
           });
         }),
       );
+    }
+
+    if (path) {
+      queryBuilder = queryBuilder.andWhere(`:path RLIKE route.reg_uri`, {
+        path,
+      });
     }
 
     if (permissionIds?.length) {
