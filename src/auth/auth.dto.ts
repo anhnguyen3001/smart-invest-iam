@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { PATTERN_VALIDATION } from 'src/common/constants/validation';
 import { OtpTypeEnum } from 'src/storage/entities/otp.entity';
+import { MethodEnum } from 'src/storage/entities/route.entity';
 import { validatePassword } from 'src/user/common';
 import { IncorrectEmailPasswordException } from './auth.exception';
 
@@ -22,6 +23,14 @@ export class LoginDto {
   @ApiProperty({ type: 'string' })
   @IsString()
   password: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsString()
+  path: string;
+
+  @ApiProperty({ enum: MethodEnum })
+  @IsString()
+  method: MethodEnum;
 
   validate() {
     if (

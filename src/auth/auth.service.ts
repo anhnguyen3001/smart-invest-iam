@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { EntityEnum } from 'src/common/constants/apiCode';
 import { ExistedException } from 'src/common/exceptions';
 import { OtpService } from 'src/otp/otp.service';
+import { RouteService } from 'src/route/route.service';
 import { OtpTypeEnum } from 'src/storage/entities/otp.entity';
 import { LoginMethodEnum, User } from 'src/storage/entities/user.entity';
 import { DetailUserDto } from 'src/user/user.dto';
@@ -30,11 +31,12 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly otpService: OtpService,
+    private readonly routeService: RouteService,
   ) {}
 
   async login(dto: LoginDto): Promise<TokenResult> {
     dto.validate();
-    const { email, password } = dto;
+    const { email, password, method, path } = dto;
 
     const user = await this.userService.findVerifiedUserByEmail(email, true);
     if (!user) {
@@ -43,6 +45,16 @@ export class AuthService {
 
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
+      throw new IncorrectEmailPasswordException();
+    }
+
+    const isAllowToLogin = await this.routeService.validateRoutePermission({
+      method,
+      path,
+      userId: user.id,
+    });
+
+    if (!isAllowToLogin) {
       throw new IncorrectEmailPasswordException();
     }
 
